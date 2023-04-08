@@ -10,6 +10,8 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import {Routes, Route, useNavigate} from 'react-router-dom';
+
 
 const pages = ['Home'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -17,6 +19,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -31,6 +34,10 @@ function ResponsiveAppBar() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const navigateToRegisterPage = () => {
+    navigate('/register');
   };
 
   return (
@@ -130,7 +137,7 @@ function ResponsiveAppBar() {
               </IconButton>
             </Tooltip> */}
             <Button color="inherit">Login</Button>
-            <Button color="inherit">Register</Button>
+            <Button color="inherit" onClick={navigateToRegisterPage}>Register</Button>
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
