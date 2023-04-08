@@ -63,7 +63,7 @@ export const GridGlobalStyled = styled(Grid)(() => {
     return {
         width: '50%',
         height: '80%',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'transparent',
         color: 'black',
         position: 'absolute',
         top: '40%',
