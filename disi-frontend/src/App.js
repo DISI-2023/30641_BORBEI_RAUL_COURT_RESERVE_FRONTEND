@@ -2,15 +2,17 @@ import { BrowserRouter as Router, Routes, Route, Routes as Switch} from 'react-r
 import './App.css';
 import Navbar from "./components/Navbar";
 import RegisterUser from "./components/RegisterUser"
+import LoginUser from './components/LoginUser';
 import Home from "./Home"
 
 function App() {
   return (
     <Router>
-        <Switch>
-                <Route exact path="/register" element={<RegisterUser />}/>
-                <Route exact path="/" element={<Home />}/>
-            </Switch>
+      <Switch>
+        <Route exact path="/register" element={<RegisterUser />}/>
+          <Route exact path="/login" element={<LoginUser />}/>
+          <Route exact path="/" element={<Home />}/>
+      </Switch>
     </Router>
   );
 }

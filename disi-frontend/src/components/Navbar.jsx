@@ -40,6 +40,10 @@ function ResponsiveAppBar() {
     navigate('/register');
   };
 
+  const navigateToLoginPage = () => {
+    navigate('/login');
+  };
+
   return (
     <AppBar position="static" style={{backgroundColor:"#038cfc"}}>
       <Container maxWidth="xl">
@@ -136,7 +140,7 @@ function ResponsiveAppBar() {
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip> */}
-            <Button color="inherit">Login</Button>
+            <Button color="inherit" onClick={navigateToLoginPage}>Login</Button>
             <Button color="inherit" onClick={navigateToRegisterPage}>Register</Button>
             <Menu
               sx={{ mt: '45px' }}
