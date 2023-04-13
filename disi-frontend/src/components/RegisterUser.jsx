@@ -2,29 +2,24 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Snackbar, Alert, IconButton, Tooltip } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { TextFieldStyled, TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from './StyledComponents';
+import axiosInstance from "../axios";
+import RegisterClient from '../services/UserService';
 
 const RegisterUser = () => {
-    //for insert client
+
     const [email, setEmail] = useState(0);
     const [username, setUsername] = useState(0);
     const [password, setPassword] = useState(0);
 
-    const getInfo = () => {
-        let credentilas = {
-            email: email,
-            username: username,
-            password: password,
-        }
-      console.log(email);
-      console.log(username);
-      console.log(password);
+    const addClient = () => {
+        RegisterClient(email, username, password);
     }
 
     return (
         <div className="bg">
             <GridGlobalStyled container spacing={2} columns={2} id='registerForm'>
                 <GridColorStyled item xs={4}>
-                    <TitleStyled id='registerFormTitle' style={{font:"inherit", fontSize:"30px"}}>
+                    <TitleStyled id='registerFormTitle' style={{ font: "inherit", fontSize: "30px" }}>
                         Register
                     </TitleStyled>
                 </GridColorStyled>
@@ -76,7 +71,7 @@ const RegisterUser = () => {
                     </Tooltip>
                 </GridColorStyled>
                 <GridStyled item xs={4}>
-                    <Button onClick={getInfo} variant='contained' style={{borderRadius: "2em"}}>
+                    <Button onClick={addClient} variant='contained' style={{ borderRadius: "2em" }}>
                         Register
                     </Button>
                 </GridStyled>
@@ -84,6 +79,5 @@ const RegisterUser = () => {
         </div>
     )
 }
-
 
 export default RegisterUser;
