@@ -1,4 +1,5 @@
 import axiosInstance from "../axios";
+import React, { useEffect, useRef, useState } from 'react';
 
 function RegisterClient(email, username, password) {
     let credentials = {
@@ -13,7 +14,7 @@ function RegisterClient(email, username, password) {
             }
         )
         .catch(error => {
-            console.log(error)
+            console.log(error);
         })
 }
 

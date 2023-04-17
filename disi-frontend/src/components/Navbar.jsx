@@ -10,7 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import {Routes, Route, useNavigate} from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 
 
 const pages = ['Home'];
@@ -45,10 +45,10 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <AppBar position="static" style={{backgroundColor:"#038cfc"}}>
+    <AppBar position="static" style={{ backgroundColor: "#038cfc" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          
+
           <Typography
             variant="h6"
             noWrap
@@ -76,7 +76,7 @@ function ResponsiveAppBar() {
               onClick={handleOpenNavMenu}
               color="inherit"
             >
-              
+
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -103,7 +103,7 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          
+
           <Typography
             variant="h5"
             noWrap
