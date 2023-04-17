@@ -1,12 +1,6 @@
 import { styled } from '@mui/system';
 import { Box, Tab, Typography, TextField, Grid } from '@mui/material';
 
-// to add one TextFieldStyled component in common styled components
-
-//overwrite one here for the homepage
-//overwrite one for the register
-//overwrite one for the create
-
 export const TextFieldStyled = styled(TextField)(() => {
     return {
         '& fieldset': {

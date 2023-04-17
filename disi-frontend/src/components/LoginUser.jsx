@@ -11,7 +11,7 @@ const LoginUser = () => {
         <div className='bg'>
             <GridGlobalStyled container spacing={2} columns={2} id='registerForm'>
                 <GridColorStyled item xs={4}>
-                    <TitleStyled id='loginFormTitle' style={{font:"inherit", fontSize:"30px"}}>
+                    <TitleStyled id='loginFormTitle' style={{ font: "inherit", fontSize: "30px" }}>
                         Login
                     </TitleStyled>
                 </GridColorStyled>
@@ -47,13 +47,13 @@ const LoginUser = () => {
                     </Tooltip>
                 </GridColorStyled>
                 <GridStyled item xs={4}>
-                    <Button variant='contained' style={{borderRadius: "2em"}}>
+                    <Button variant='contained' style={{ borderRadius: "2em" }}>
                         Sign in
                     </Button>
                 </GridStyled>
                 <GridStyled item xs={4}>
                     <Typography>
-                        Don't have an account yet? 
+                        Don't have an account yet?
                     </Typography>
                     <Link href="/register">
                         <Typography>
