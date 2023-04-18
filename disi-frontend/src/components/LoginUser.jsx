@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Snackbar, Alert, IconButton, Tooltip, Typography, Link } from '@mui/material';
+import React, { useState } from 'react';
+import { Button,IconButton, Tooltip, Typography, Link } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { TextFieldStyled, TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from './StyledComponents';
-import LoginService from '../services/LoginService';
+import { TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from './StyledComponents';
+import {LoginService} from '../services/UserService';
 
 const LoginUser = () => {
     const [email, setEmail] = useState(0);

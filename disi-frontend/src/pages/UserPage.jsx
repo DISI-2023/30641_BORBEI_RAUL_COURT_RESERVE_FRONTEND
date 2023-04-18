@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from '../components/StyledComponents';
-import { Button } from '@mui/material';
+import { Button, Snackbar, Alert } from '@mui/material';
+import {ChangePasswordService} from '../services/UserService';
 
 
 const UserPage = () => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
     const handleChangePassword = () => {
-
+        try {
+            setIsSnackbarOpen(true);
+            ChangePasswordService(currentPassword, newPassword);
+        } catch (e) {
+            console.log(e.data);
+        }
     }
+
+    const handleClose = () => {
+        setIsSnackbarOpen(false);
+    };
 
     return (
         <div className="bg">
@@ -51,7 +62,17 @@ const UserPage = () => {
                     </Button>
                 </GridStyled>
             </GridGlobalStyled>
-         
+            <Snackbar
+                id='successMessageForEditPassword'
+                open={isSnackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert id='successMessageForEditPassword' onClose={handleClose} severity='success' sx={{ width: '100%' }}>
+                    Your new password was submitted successfully!
+                </Alert>
+            </Snackbar>
         </div>
     )
 
