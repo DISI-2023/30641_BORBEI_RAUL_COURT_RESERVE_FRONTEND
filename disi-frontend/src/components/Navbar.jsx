@@ -44,6 +44,14 @@ function ResponsiveAppBar() {
     navigate('/login');
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("id")
+    localStorage.removeItem("username")
+    localStorage.removeItem("email")
+    localStorage.removeItem("isAdmin")
+    setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+  }
+
   return (
     <AppBar position="static" style={{ backgroundColor: "#038cfc" }}>
       <Container maxWidth="xl">
@@ -140,8 +148,17 @@ function ResponsiveAppBar() {
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip> */}
-            <Button color="inherit" onClick={navigateToLoginPage}>Login</Button>
-            <Button color="inherit" onClick={navigateToRegisterPage}>Register</Button>
+            {
+              localStorage.getItem("email") !== null ? (
+                <Button color="inherit" onClick={handleLogout}>Logout</Button>
+              ) : (
+                <div>
+                  <Button color="inherit" onClick={navigateToLoginPage}>Login</Button>
+                  <Button color="inherit" onClick={navigateToRegisterPage}>Register</Button>
+                </div>
+              )
+            }
+            
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
