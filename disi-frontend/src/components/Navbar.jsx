@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 
 const pages = ['Home'];
@@ -43,6 +44,10 @@ function ResponsiveAppBar() {
   const navigateToLoginPage = () => {
     navigate('/login');
   };
+
+  const navigateToUserPage = () => {
+    navigate('/user');
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("id")
@@ -150,7 +155,11 @@ function ResponsiveAppBar() {
             </Tooltip> */}
             {
               localStorage.getItem("email") !== null ? (
-                <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                <div>
+                  <AccountCircleIcon sx={{marginRight: "0.5em", marginBottom: "-0.25em", cursor: "pointer"}}
+                                     onClick={navigateToUserPage}/>
+                  <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                </div>
               ) : (
                 <div>
                   <Button color="inherit" onClick={navigateToLoginPage}>Login</Button>
