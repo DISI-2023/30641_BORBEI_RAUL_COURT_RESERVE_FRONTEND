@@ -41,7 +41,7 @@ const LoginUser = () => {
                 </GridColorStyled>
                 <GridColorStyled item xs={4}>
                     <TextFieldRegisterUserStyled
-                        id='registerUserFormPasswordField'
+                        id='loginUserFormPasswordField'
                         label='Password'
                         variant='outlined'
                         type='password'
