@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { formControlLabelClasses } from '@mui/material';
 
 
 const pages = ['Home'];
@@ -45,6 +46,14 @@ function Navbar() {
 
   const navigateToUserPage = () => {
     navigate('/user');
+  }
+
+  const navigateToFieldPage = () => {
+    navigate('/field');
+  }
+
+  const navigateToLocationPage = () => {
+    navigate('/location');
   }
 
   const handleLogout = () => {
@@ -154,9 +163,21 @@ function Navbar() {
             {
               localStorage.getItem("email") !== null ? (
                 <div>
-                  <AccountCircleIcon sx={{marginRight: "0.5em", marginBottom: "-0.25em", cursor: "pointer"}}
-                                     onClick={navigateToUserPage}/>
-                  <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                  {
+                    localStorage.getItem("isAdmin") !== 'false' ? (
+                      <div>
+                         <Button color="inherit" onClick={navigateToLocationPage}>ADD LOCATION</Button>
+                        <Button color="inherit" onClick={navigateToFieldPage}>ADD FIELD</Button>
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <AccountCircleIcon sx={{ marginRight: "0.5em", marginBottom: "-0.25em", cursor: "pointer" }}
+                          onClick={navigateToUserPage} />
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                      </div>
+                    )
+                  }
                 </div>
               ) : (
                 <div>
@@ -165,7 +186,7 @@ function Navbar() {
                 </div>
               )
             }
-            
+
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"

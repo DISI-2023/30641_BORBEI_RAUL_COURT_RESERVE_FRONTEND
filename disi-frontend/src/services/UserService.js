@@ -27,7 +27,12 @@ export function LoginService(email, password) {
         .then(
             res => {
                 if (res.status !== 404 || res.status !== 400) {
-                    setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+                    if (res.data.isAdmin === true) {
+                        setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
+                    }
+                    else {
+                        setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+                    }
                     if (res.data !== null) {
                         localStorage.setItem("id", res.data.id)
                         localStorage.setItem("email", res.data.email)
