@@ -11,6 +11,12 @@ function LoginService(email, password) {
             res => {
                 if (res.status !== 404) {
                     setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+                    if (res.data !== null) {
+                        localStorage.setItem("id", res.data.id)
+                        localStorage.setItem("email", res.data.email)
+                        localStorage.setItem("username", res.data.username)
+                        localStorage.setItem("isAdmin", res.data.isAdmin)
+                    }
                 }
             }
         )
