@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import Navbar from "./components/Navbar";
-import ResponsiveAppBar from './components/Navbar';
+import React from 'react';
+import Navbar from './components/Navbar';
 
 const Home = () => {
     return (
-        <div>
-          <ResponsiveAppBar></ResponsiveAppBar>
+        <div className="bg">
+          <Navbar></Navbar>
         </div>
     )
 
 }
-
-
-
 
 export default Home;

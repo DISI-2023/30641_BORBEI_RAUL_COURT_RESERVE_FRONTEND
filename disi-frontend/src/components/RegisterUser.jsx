@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Button, Snackbar, Alert, IconButton, Tooltip } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { TextFieldStyled, TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from './StyledComponents';
+import { TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from './StyledComponents';
 import {
     validateUsernameRegister,
     validateEmailRegister,
     validatePasswordRegister
 } from '../validators/RegisterValidators.tsx';
 import useTextFieldErrors from '../hooks/UseTextFieldErrors.tsx';
-import RegisterClient from '../services/UserService';
+import {RegisterClient} from '../services/UserService';
 
 const RegisterUser = () => {
 
