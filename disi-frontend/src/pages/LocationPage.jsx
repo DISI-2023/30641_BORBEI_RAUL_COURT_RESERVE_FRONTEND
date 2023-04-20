@@ -14,6 +14,7 @@ const LocationPage = () => {
     const handleClick = async () => {
         AddLocationService(name, street, number);
         setIsSnackbarOpen(true);
+        setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
     };
 
     const handleClose = () => {

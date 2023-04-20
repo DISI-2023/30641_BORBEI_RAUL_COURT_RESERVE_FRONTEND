@@ -1,41 +1,25 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import axiosInstance from "../axios";
 import Navbar from '../components/Navbar';
-import { Button, Snackbar, Alert } from '@mui/material';
-import { CreateFieldGridStyled, MainGridStyled, GridColorStyled, TextFieldFieldStyled, TitleStyled, SaveButtonStyled } from './StyledComponents';
-
+import { Button, Snackbar, Alert, InputLabel, Select, FormControl, MenuItem } from '@mui/material';
+import { CreateFieldGridStyled, MainGridStyled, GridColorStyled, TextFieldFieldStyled, TitleStyled, SaveButtonStyled, LabelStyled, LabelFieldStyled, AlertStyled } from './StyledComponents';
+import { AddFieldService } from '../services/FieldService';
 
 const FieldPage = () => {
 
     const [name, setName] = useState('');
-    const [location, setLocation] = useState('');
-
-    const FieldFormFields = {
-        name: 'name',
-        location: 'location',
-    }
+    const [locationId, setLocationId] = useState('');
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
     const handleClick = async () => {
-
+        AddFieldService(name, locationId);
+        setIsSnackbarOpen(true);
+        setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
     };
 
     const handleClose = () => {
-
+        setIsSnackbarOpen(false);
     };
-
-    const formFieldsManagers = useMemo(
-        () => ({
-            [FieldFormFields.name]: name,
-            [FieldFormFields.location]: location,
-        }),
-        [name, location]
-    );
-
-    const onInputChange = useCallback(
-        (ev) => {
-            formFieldsManagers[ev.target.name].setValue(ev.target.value);
-        },
-        [formFieldsManagers]
-    );
 
     return (
         <div className="bg">
@@ -56,27 +40,49 @@ const FieldPage = () => {
                             label='Field name*'
                             variant='outlined'
                             placeholder='Field name*'
+                            onChange={(e) => {
+                                setName(e.target.value);
+                            }}
                         />
                     </GridColorStyled>
                     <GridColorStyled id='gridForFieldLocation' sx={{ marginTop: '10px' }}>
                         <TextFieldFieldStyled
                             sx={{ marginBottom: '0px' }}
-                            id='inputForFieldLocation'
+                            id='dropdownForCountry'
                             label='Location*'
                             variant='outlined'
                             placeholder='Location*'
+                            onChange={(e) => {
+                                setLocationId(e.target.value);
+                            }}
                         />
                     </GridColorStyled>
                     <GridColorStyled>
                         <SaveButtonStyled
                             id='createFieldButton'
                             variant='contained'
+                            disabled={
+                                name === '' ||
+                                locationId === ''
+                            }
+                            onClick={handleClick}
                         >
                             Save
                         </SaveButtonStyled>
                     </GridColorStyled>
                 </MainGridStyled>
             </CreateFieldGridStyled>
+            <Snackbar
+                id='snackbarForCreateField'
+                open={isSnackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <AlertStyled onClose={handleClose} severity='success' id='alertForSuccessfulCreationOfField'>
+                    Field was added successfully!
+                </AlertStyled>
+            </Snackbar>
         </div>
     )
 

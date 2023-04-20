@@ -28,6 +28,16 @@ export function LoginService(email, password) {
             res => {
                 if (res.status !== 404 || res.status !== 400) {
                     if (res.data.isAdmin === true) {
+                        axiosInstance.get("/field")
+                            .then(
+                                res => {
+                                    localStorage.setItem("fieldList", JSON.stringify(res.data));
+                                    localStorage.setItem("totalNoFields", JSON.stringify(res.data.length));
+                                }
+                            )
+                            .catch(error => {
+                                console.log(error);
+                            })
                         setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
                     }
                     else {
