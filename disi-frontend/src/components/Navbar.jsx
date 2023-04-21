@@ -6,17 +6,16 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 
 const pages = ['Home'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-function ResponsiveAppBar() {
+function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
@@ -43,6 +42,18 @@ function ResponsiveAppBar() {
   const navigateToLoginPage = () => {
     navigate('/login');
   };
+
+  const navigateToUserPage = () => {
+    navigate('/user');
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("id")
+    localStorage.removeItem("username")
+    localStorage.removeItem("email")
+    localStorage.removeItem("isAdmin")
+    setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+  }
 
   return (
     <AppBar position="static" style={{ backgroundColor: "#038cfc" }}>
@@ -140,8 +151,21 @@ function ResponsiveAppBar() {
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip> */}
-            <Button color="inherit" onClick={navigateToLoginPage}>Login</Button>
-            <Button color="inherit" onClick={navigateToRegisterPage}>Register</Button>
+            {
+              localStorage.getItem("email") !== null ? (
+                <div>
+                  <AccountCircleIcon sx={{marginRight: "0.5em", marginBottom: "-0.25em", cursor: "pointer"}}
+                                     onClick={navigateToUserPage}/>
+                  <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                </div>
+              ) : (
+                <div>
+                  <Button color="inherit" onClick={navigateToLoginPage}>Login</Button>
+                  <Button color="inherit" onClick={navigateToRegisterPage}>Register</Button>
+                </div>
+              )
+            }
+            
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
@@ -170,4 +194,4 @@ function ResponsiveAppBar() {
     </AppBar>
   );
 }
-export default ResponsiveAppBar;
+export default Navbar;

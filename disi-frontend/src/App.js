@@ -1,8 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Routes as Switch} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes as Switch} from 'react-router-dom';
 import './App.css';
-import Navbar from "./components/Navbar";
 import RegisterUser from "./components/RegisterUser"
 import LoginUser from './components/LoginUser';
+import UserPage from './pages/UserPage';
 import Home from "./Home"
 
 function App() {
@@ -10,8 +10,9 @@ function App() {
     <Router>
       <Switch>
         <Route exact path="/register" element={<RegisterUser />}/>
-          <Route exact path="/login" element={<LoginUser />}/>
-          <Route exact path="/" element={<Home />}/>
+        <Route exact path="/login" element={<LoginUser />}/>
+        <Route exact path="/user" element={<UserPage />}/>
+        <Route exact path="/" element={<Home />}/>
       </Switch>
     </Router>
   );
