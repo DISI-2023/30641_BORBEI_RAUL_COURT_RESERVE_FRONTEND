@@ -69,8 +69,8 @@ export function FieldCard({ field }) {
         onClose={handleCloseDelete}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert id='successMessageForRegisterUser' onClose={handleCloseDelete} severity='success' sx={{ width: '100%' }}>
-          The field was successfully deleted!
+        <Alert id='successMessageForDeleteField' onClose={handleCloseDelete} severity='success' sx={{ width: '100%' }}>
+          The field was deleted successfully!
         </Alert>
       </Snackbar>
     </FieldCardStyled>

@@ -59,7 +59,7 @@ const UpdateFieldPage = () => {
                     </GridColorStyled>
                     <GridColorStyled>
                         <SaveButtonStyled
-                            id='createFieldButton'
+                            id='updateFieldButton'
                             variant='contained'
                             disabled={
                                 name === '' ||
@@ -73,7 +73,7 @@ const UpdateFieldPage = () => {
                 </MainGridStyled>
             </CreateFieldGridStyled>
             <Snackbar
-                id='snackbarForCreateField'
+                id='snackbarForUpdateField'
                 open={isSnackbarOpen}
                 autoHideDuration={6000}
                 onClose={handleClose}

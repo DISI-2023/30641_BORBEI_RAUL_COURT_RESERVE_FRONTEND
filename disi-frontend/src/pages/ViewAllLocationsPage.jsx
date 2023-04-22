@@ -13,15 +13,15 @@ const ViewAllLocationsPage = () => {
             <Navbar></Navbar>
             <AdminMainGridStyled container id='viewAllFieldsPageContainer'>
                 <Grid item id='viewAllFieldsContainer' sx={{ marginTop: '71px' }}>
-                    <CenteredTitlesStyled container id='viewAllFieldsBasicInformation'>
-                        <Grid item id='allFieldsHeader'>
+                    <CenteredTitlesStyled container id='viewAllLocationsBasicInformation'>
+                        <Grid item id='allLocationssHeader'>
                             <h1>All locations</h1>
                         </Grid>
-                        <Grid item id='totalNoFieldsHeader'>
+                        <Grid item id='totalNoLocationsHeader'>
                             <h3>{JSON.parse(localStorage.getItem("locationList")).length} results</h3>
                         </Grid>
                     </CenteredTitlesStyled>
-                    <FieldsGridStyled container spacing={2} id='allFieldsGridContainer'>
+                    <FieldsGridStyled container spacing={2} id='allLocationsGridContainer'>
                         {JSON.parse(localStorage.getItem("locationList")).map((location) => {
                             return (
                                 <Grid item key={location.id}>
