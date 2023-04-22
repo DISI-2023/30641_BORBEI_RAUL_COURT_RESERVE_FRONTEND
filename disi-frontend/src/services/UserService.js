@@ -27,7 +27,32 @@ export function LoginService(email, password) {
         .then(
             res => {
                 if (res.status !== 404 || res.status !== 400) {
-                    setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+                    if (res.data.isAdmin === true) {
+                        axiosInstance.get("/field")
+                            .then(
+                                res => {
+                                    localStorage.setItem("fieldList", JSON.stringify(res.data));
+                                    localStorage.setItem("totalNoFields", JSON.stringify(res.data.length));
+                                }
+                            )
+                            .catch(error => {
+                                console.log(error);
+                            })
+                        axiosInstance.get("/location")
+                            .then(
+                                res => {
+                                    localStorage.setItem("locationList", JSON.stringify(res.data));
+                                    localStorage.setItem("totalNoLocations", JSON.stringify(res.data.length));
+                                }
+                            )
+                            .catch(error => {
+                                console.log(error);
+                            })
+                        setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
+                    }
+                    else {
+                        setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+                    }
                     if (res.data !== null) {
                         localStorage.setItem("id", res.data.id)
                         localStorage.setItem("email", res.data.email)
