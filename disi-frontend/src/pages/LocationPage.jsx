@@ -14,7 +14,7 @@ const LocationPage = () => {
     const handleClick = async () => {
         AddLocationService(name, street, number);
         setIsSnackbarOpen(true);
-        setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
+        setTimeout(() => { window.location.href = 'http://localhost:3000/loc'; }, 2000);
     };
 
     const handleClose = () => {
@@ -35,7 +35,7 @@ const LocationPage = () => {
                     <GridColorStyled id='gridForLocationName'>
                         <TextFieldFieldStyled
                             sx={{ marginBottom: '0px' }}
-                            id='inputForLocationdName'
+                            id='inputForLocationName'
                             autoComplete='off'
                             label='Location name*'
                             variant='outlined'

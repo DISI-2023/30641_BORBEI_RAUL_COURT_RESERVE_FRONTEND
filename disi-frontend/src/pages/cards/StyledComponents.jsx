@@ -1,9 +1,6 @@
 import { Card, Grid, Pagination, Typography, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
-import LocationCityIcon from '@mui/icons-material/LocationCity';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 export const FieldsGridStyled = styled(Grid)(() => {
   return {
@@ -118,5 +115,19 @@ export const LocationDetailsStyled = styled(Typography)(() => {
     color: 'lightslategray',
     textTransform: 'uppercase',
     fontFamily: 'Work Sans'
+  };
+});
+
+export const ButtonUpdateAndDeleteStyled = styled(Button)(() => {
+  return {
+    marginTop: '15px',
+    height: '50px',
+    '&:hover': {
+      backgroundColor: '#90caf9',
+      boxShadow: 'none'
+    },
+    ':disabled': {
+      backgroundColor: '#e0e0e0'
+    }
   };
 });
