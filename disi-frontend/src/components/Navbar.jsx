@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { formControlLabelClasses } from '@mui/material';
 import axiosInstance from "../axios";
+import { GetFieldsService } from '../services/FieldService';
+import { GetLocationsService } from '../services/LocationService';
 
 
 const pages = ['Home'];
@@ -63,20 +65,6 @@ function Navbar() {
     localStorage.removeItem("email")
     localStorage.removeItem("isAdmin")
     setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
-  }
-
-  const GetFields = () => {
-    axiosInstance.get("/field")
-      .then(
-        res => {
-          localStorage.setItem("fieldList", JSON.stringify(res.data));
-          localStorage.setItem("totalNoFields", JSON.stringify(res.data.length));
-          window.location.reload(false);
-        }
-      )
-      .catch(error => {
-        console.log(error);
-      })
   }
 
   return (
@@ -182,8 +170,9 @@ function Navbar() {
                     localStorage.getItem("isAdmin") !== 'false' ? (
                       <div>
                         <Button color="inherit" onClick={navigateToLocationPage}>ADD LOCATION</Button>
+                        <Button color="inherit" onClick={GetLocationsService}>SHOW LOCATIONS</Button>
                         <Button color="inherit" onClick={navigateToFieldPage}>ADD FIELD</Button>
-                        <Button color="inherit" onClick={GetFields}>SHOw FIELDS</Button>
+                        <Button color="inherit" onClick={GetFieldsService}>SHOW FIELDS</Button>
                         <Button color="inherit" onClick={handleLogout}>Logout</Button>
                       </div>
                     ) : (

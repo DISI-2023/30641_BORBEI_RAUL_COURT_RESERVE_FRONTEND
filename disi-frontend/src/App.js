@@ -6,6 +6,7 @@ import UserPage from './pages/UserPage';
 import AdminPage from './pages/AdminPage';
 import FieldPage from './pages/FieldPage';
 import LocationPage from './pages/LocationPage';
+import ViewAllLocationsPage from './pages/ViewAllLocationsPage';
 import Home from "./Home"
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route exact path="/admin" element={<AdminPage />} />
         <Route exact path="/field" element={<FieldPage />} />
         <Route exact path="/location" element={<LocationPage />} />
+        <Route exact path="/loc" element={<ViewAllLocationsPage />} />
         <Route exact path="/" element={<Home />} />
       </Switch>
     </Router>

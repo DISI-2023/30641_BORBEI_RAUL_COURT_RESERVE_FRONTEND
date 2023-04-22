@@ -6,6 +6,7 @@ import {
   FieldCardContentStyled,
   FieldLocationStyled,
   FieldNameStyled,
+  LocationOnIconStyled,
 } from './StyledComponents';
 
 export function FieldCard({ field }) {
@@ -17,7 +18,10 @@ export function FieldCard({ field }) {
             <FieldCardContentStyled container spacing={2} id='fieldCardContent'>
               <Grid item id='fieldCardContentDetails'>
                 <FieldNameStyled id='fieldCardName'>{field.name}</FieldNameStyled>
-                <FieldLocationStyled id='fieldCardLocation'>{field.locationId}</FieldLocationStyled>
+                <Grid item id='fieldCardLocationDetails' container direction='row'>
+                  <LocationOnIconStyled />
+                  <FieldLocationStyled id='fieldCardLocation'>{field.locationDTO.name}, {field.locationDTO.street} {field.locationDTO.number}</FieldLocationStyled>
+                </Grid>
               </Grid>
             </FieldCardContentStyled>
           </Grid>

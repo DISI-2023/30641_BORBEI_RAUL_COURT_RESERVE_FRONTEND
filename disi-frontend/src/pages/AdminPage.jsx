@@ -4,13 +4,10 @@ import Navbar from '../components/Navbar';
 import { Button, Snackbar, Alert, Grid, CardContent } from '@mui/material';
 import { ChangePasswordService } from '../services/UserService';
 import { MainGridStyled, AdminMainGridStyled, StickyFilterMenuStyled, CenteredTitlesStyled, FieldsGridStyled, FieldCardStyled, FieldCardContentStyled, FieldNameStyled, FieldLocationStyled } from './StyledComponents';
-import { FieldCard } from './FieldCard/FieldCardPage';
+import { FieldCard } from './cards/FieldCard';
 
 
 const AdminPage = () => {
-    useEffect(() => {
-
-    }, [])
 
     return (
         <div className="bg">
@@ -18,7 +15,7 @@ const AdminPage = () => {
             <AdminMainGridStyled container id='viewAllFieldsPageContainer'>
                 <Grid item id='viewAllFieldsContainer' sx={{ marginTop: '71px' }}>
                     <CenteredTitlesStyled container id='viewAllFieldsBasicInformation'>
-                        <Grid item id='allEventsHeader'>
+                        <Grid item id='allFieldsHeader'>
                             <h1>All fields</h1>
                         </Grid>
                         <Grid item id='totalNoFieldsHeader'>

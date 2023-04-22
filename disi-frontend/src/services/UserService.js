@@ -38,6 +38,16 @@ export function LoginService(email, password) {
                             .catch(error => {
                                 console.log(error);
                             })
+                        axiosInstance.get("/location")
+                            .then(
+                                res => {
+                                    localStorage.setItem("locationList", JSON.stringify(res.data));
+                                    localStorage.setItem("totalNoLocations", JSON.stringify(res.data.length));
+                                }
+                            )
+                            .catch(error => {
+                                console.log(error);
+                            })
                         setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
                     }
                     else {

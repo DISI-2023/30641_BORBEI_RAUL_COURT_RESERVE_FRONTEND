@@ -39,7 +39,7 @@ const LocationPage = () => {
                             autoComplete='off'
                             label='Location name*'
                             variant='outlined'
-                            placeholder='Field name*'
+                            placeholder='Location name*'
                             onChange={e => setName(e.target.value)}
                         />
                     </GridColorStyled>
