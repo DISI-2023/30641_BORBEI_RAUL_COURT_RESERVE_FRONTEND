@@ -10,7 +10,7 @@ class StringComparer {
     }
 
     truncateString() {
-        return this.value.replace(/\s+/g, ' ').trim();
+        return this.value.replace(/\s+/g, '').trim();
     }
 }
 
