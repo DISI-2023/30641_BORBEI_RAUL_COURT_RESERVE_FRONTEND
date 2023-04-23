@@ -25,7 +25,6 @@ export function AddLocationService(name, street, number) {
         .catch(error => {
             console.log(error);
         })
-    window.location.href = 'http://localhost:3000/loc';
 }
 
 export function GetLocationsService() {

@@ -3,16 +3,16 @@ import axiosInstance from "../axios";
 import Navbar from '../components/Navbar';
 import { Button, Snackbar, Alert, InputLabel, Select, FormControl, MenuItem } from '@mui/material';
 import { CreateFieldGridStyled, MainGridStyled, GridColorStyled, TextFieldFieldStyled, TitleStyled, SaveButtonStyled, LabelStyled, LabelFieldStyled, AlertStyled } from './StyledComponents';
-import { AddFieldService } from '../services/FieldService';
+import { AddFieldService, UpdateFieldService } from '../services/FieldService';
 
-const FieldPage = () => {
+const UpdateFieldPage = () => {
 
     const [name, setName] = useState('');
     const [locationId, setLocationId] = useState('');
     const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
     const handleClick = async () => {
-        AddFieldService(name, locationId);
+        UpdateFieldService(localStorage.getItem("fieldToUpdate"), name, locationId);
         setIsSnackbarOpen(true);
         setTimeout(() => { window.location.href = 'http://localhost:3000/admin'; }, 2000);
     };
@@ -28,7 +28,7 @@ const FieldPage = () => {
                 <MainGridStyled>
                     <GridColorStyled id='gridForFieldName'>
                         <TitleStyled id='registerFormTitle' style={{ font: "inherit", fontSize: "30px" }}>
-                            Create a new field
+                            Update field
                         </TitleStyled>
                     </GridColorStyled>
                     <br></br>
@@ -37,9 +37,9 @@ const FieldPage = () => {
                             sx={{ marginBottom: '0px' }}
                             id='inputForFieldName'
                             autoComplete='off'
-                            label='Field name*'
+                            label='New name*'
                             variant='outlined'
-                            placeholder='Field name*'
+                            placeholder='New name*'
                             onChange={(e) => {
                                 setName(e.target.value);
                             }}
@@ -49,9 +49,9 @@ const FieldPage = () => {
                         <TextFieldFieldStyled
                             sx={{ marginBottom: '0px' }}
                             id='inputForLocation'
-                            label='Location*'
+                            label='New location*'
                             variant='outlined'
-                            placeholder='Location*'
+                            placeholder='New ocation*'
                             onChange={(e) => {
                                 setLocationId(e.target.value);
                             }}
@@ -59,7 +59,7 @@ const FieldPage = () => {
                     </GridColorStyled>
                     <GridColorStyled>
                         <SaveButtonStyled
-                            id='createFieldButton'
+                            id='updateFieldButton'
                             variant='contained'
                             disabled={
                                 name === '' ||
@@ -73,14 +73,14 @@ const FieldPage = () => {
                 </MainGridStyled>
             </CreateFieldGridStyled>
             <Snackbar
-                id='snackbarForCreateField'
+                id='snackbarForUpdateField'
                 open={isSnackbarOpen}
                 autoHideDuration={6000}
                 onClose={handleClose}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
                 <AlertStyled onClose={handleClose} severity='success' id='alertForSuccessfulCreationOfField'>
-                    Field was added successfully!
+                    Field was updated successfully!
                 </AlertStyled>
             </Snackbar>
         </div>
@@ -88,4 +88,4 @@ const FieldPage = () => {
 
 }
 
-export default FieldPage;
+export default UpdateFieldPage;
