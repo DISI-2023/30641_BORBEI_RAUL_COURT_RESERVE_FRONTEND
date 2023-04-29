@@ -3,29 +3,23 @@ import './App.css';
 import RegisterUser from "./components/RegisterUser"
 import LoginUser from './components/LoginUser';
 import UserPage from './pages/UserPage';
-import AdminPage from './pages/AdminPage';
-import FieldPage from './pages/FieldPage';
-import LocationPage from './pages/LocationPage';
-import ViewAllLocationsPage from './pages/ViewAllLocationsPage';
-import UpdateFieldPage from './pages/UpdateFieldPage';
 import HomePage from "./pages/HomePage";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import NavigationBar from './components/NavigationBar';
+import FieldsPage from './pages/FieldsPage';
 
 function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <NavigationBar/>
       <Router>
         <Switch>
           <Route exact path="/register" element={<RegisterUser />} />
           <Route exact path="/login" element={<LoginUser />} />
           <Route exact path="/user" element={<UserPage />} />
-          <Route exact path="/admin" element={<AdminPage />} />
-          <Route exact path="/field" element={<FieldPage />} />
-          <Route exact path="/location" element={<LocationPage />} />
-          <Route exact path="/loc" element={<ViewAllLocationsPage />} />
-          <Route exact path="/update" element={<UpdateFieldPage />} />
           <Route exact path="/" element={<HomePage />} />
+          <Route exact path="/fields" element={<FieldsPage />} />
         </Switch>
       </Router>
     </LocalizationProvider>)

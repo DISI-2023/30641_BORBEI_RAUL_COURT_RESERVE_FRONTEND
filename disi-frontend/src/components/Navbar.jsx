@@ -16,7 +16,7 @@ import { GetFieldsService } from '../services/FieldService';
 import { GetLocationsService } from '../services/LocationService';
 
 
-const pages = ['Home'];
+const pages = ['Fields', 'Locations'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Navbar() {
@@ -68,27 +68,11 @@ function Navbar() {
   }
 
   return (
-    <AppBar position="static" style={{ backgroundColor: "#038cfc" }}>
+    <AppBar position="static" style={{ background: "linear-gradient(90deg, rgba(174,238,177,1) 0%, rgba(148,187,233,1) 100%)" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
 
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
+          <img src='logo.png' style={{ width: "40px" }} />
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -99,7 +83,6 @@ function Navbar() {
               onClick={handleOpenNavMenu}
               color="inherit"
             >
-
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -116,35 +99,20 @@ function Navbar() {
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{
-                display: { xs: 'block', md: 'none' },
+                display: { xs: 'block', md: 'none' }
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={handleCloseNavMenu} sx={{ marginLeft: "2%" }}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
 
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
+
+
+
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button

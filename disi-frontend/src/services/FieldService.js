@@ -9,17 +9,9 @@ export function AddFieldService(name, locationId) {
     axiosInstance.post("/field", credentials)
         .then(
             res => {
-            }
-        )
-        .catch(error => {
-            console.log(error);
-        })
-
-    axiosInstance.get("/field")
-        .then(
-            res => {
-                localStorage.setItem("fieldList", JSON.stringify(res.data));
-                localStorage.setItem("totalNoFields", JSON.stringify(res.data.length));
+                if (res.status !== 404 || res.status !== 400) {
+                    window.location.reload()
+                }
             }
         )
         .catch(error => {
@@ -27,25 +19,27 @@ export function AddFieldService(name, locationId) {
         })
 }
 
-export function GetFieldsService() {
+export function GetFieldsService(callback, errorCallback) {
     axiosInstance.get("/field")
         .then(
             res => {
-                localStorage.setItem("fieldList", JSON.stringify(res.data));
-                localStorage.setItem("totalNoFields", JSON.stringify(res.data.length));
+                if (callback != null)
+                    callback(res)
             }
         )
         .catch(error => {
-            console.log(error);
+            if (errorCallback != null)
+                errorCallback(error)
         })
-    window.location.href = 'http://localhost:3000/admin';
 }
 
 export function DeleteFieldService(id) {
-    console.log(id);
     axiosInstance.delete("/field/" + id)
         .then(
             res => {
+                if (res.status !== 404 || res.status !== 400) {
+                    window.location.reload()
+                }
             }
         )
         .catch(error => {
@@ -62,16 +56,9 @@ export function UpdateFieldService(id, name, locationId) {
     axiosInstance.put("/field", credentials)
         .then(
             res => {
-            }
-        )
-        .catch(error => {
-            console.log(error);
-        })
-    axiosInstance.get("/field")
-        .then(
-            res => {
-                localStorage.setItem("fieldList", JSON.stringify(res.data));
-                localStorage.setItem("totalNoFields", JSON.stringify(res.data.length));
+                if (res.status !== 404 || res.status !== 400) {
+                    window.location.reload()
+                }
             }
         )
         .catch(error => {
