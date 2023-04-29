@@ -32,6 +32,7 @@ export function LoginService(email, password) {
                         localStorage.setItem("email", res.data.email)
                         localStorage.setItem("username", res.data.username)
                         localStorage.setItem("isAdmin", res.data.isAdmin)
+                        setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 1000);
                     }
                 }
             }

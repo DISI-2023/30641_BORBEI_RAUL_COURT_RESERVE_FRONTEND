@@ -79,60 +79,66 @@ const FieldsPage = () => {
 
     return (
         <div>
-            <div style={{ display: "flex", marginLeft: "1em", marginTop: "1em" }}>
-                <AddCircleIcon
-                    onClick={() => {
-                        handleOpenAddFieldModal()
-                    }}
-                    sx={{
-                        fontSize: "3em",
-                        cursor: "pointer"
-                    }} />
-                <p style={{ fontWeight: "bolder", fontSize: "2em", marginLeft: "0.3em" }}>
-                    Add a new field
-                </p>
-                <Modal
-                    open={openAddFieldModal}
-                    onClose={handleCloseAddFieldModal}
-                    aria-labelledby="add-field-modal-title"
-                    aria-describedby="add-field-modal-description"
-                >
-                    <Box sx={style}>
-                        <Typography id="add-field-modal-title" variant="h6" component="h2" sx={{ fontWeight: "bolder", marginBottom: "0.5em" }}>
-                            Add field information
-                        </Typography>
-                        <Form>
-                            <Form.Group className="mb-3" controlId="formFieldName">
-                                <Form.Label style={{ fontStyle: "italic" }}>Name</Form.Label>
-                                <Form.Control type="text" placeholder="Enter a name" onChange={(e) => { setName(e.target.value) }} />
-                            </Form.Group>
+            {
+                localStorage.getItem("isAdmin") === "true" ? (
+                    <div style={{ display: "flex", marginLeft: "1em", marginTop: "1em" }}>
+                        <AddCircleIcon
+                            onClick={() => {
+                                handleOpenAddFieldModal()
+                            }}
+                            sx={{
+                                fontSize: "3em",
+                                cursor: "pointer"
+                            }} />
+                        <p style={{ fontWeight: "bolder", fontSize: "2em", marginLeft: "0.3em" }}>
+                            Add a new field
+                        </p>
+                        <Modal
+                            open={openAddFieldModal}
+                            onClose={handleCloseAddFieldModal}
+                            aria-labelledby="add-field-modal-title"
+                            aria-describedby="add-field-modal-description"
+                        >
+                            <Box sx={style}>
+                                <Typography id="add-field-modal-title" variant="h6" component="h2" sx={{ fontWeight: "bolder", marginBottom: "0.5em" }}>
+                                    Add field information
+                                </Typography>
+                                <Form>
+                                    <Form.Group className="mb-3" controlId="formFieldName">
+                                        <Form.Label style={{ fontStyle: "italic" }}>Name</Form.Label>
+                                        <Form.Control type="text" placeholder="Enter a name" onChange={(e) => { setName(e.target.value) }} />
+                                    </Form.Group>
 
-                            <Form.Group className="mb-3" controlId="formFieldLocation">
-                                <Form.Label style={{ fontStyle: "italic" }}>Location</Form.Label>
-                                <Form.Select
-                                    value={locationId}
-                                    onChange={(e) => {
-                                        setLocationId(e.target.value)
-                                    }}>
-                                    <option>Select a location</option>
-                                    {
-                                        locations.map(location => (
-                                            <option value={location.id}>{location.name}</option>
-                                        ))
-                                    }
-                                </Form.Select>
-                            </Form.Group>
-                            <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
-                                onClick={() => {
-                                    AddFieldService(name, locationId);
-                                }}>
-                                Submit
-                            </Button>
-                        </Form>
-                    </Box>
-                </Modal>
-            </div>
-            <div style={{ marginLeft: "1em" }}>
+                                    <Form.Group className="mb-3" controlId="formFieldLocation">
+                                        <Form.Label style={{ fontStyle: "italic" }}>Location</Form.Label>
+                                        <Form.Select
+                                            value={locationId}
+                                            onChange={(e) => {
+                                                setLocationId(e.target.value)
+                                            }}>
+                                            <option>Select a location</option>
+                                            {
+                                                locations.map(location => (
+                                                    <option value={location.id}>{location.name}</option>
+                                                ))
+                                            }
+                                        </Form.Select>
+                                    </Form.Group>
+                                    <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
+                                        onClick={() => {
+                                            AddFieldService(name, locationId);
+                                        }}>
+                                        Submit
+                                    </Button>
+                                </Form>
+                            </Box>
+                        </Modal>
+                    </div>
+                ) : (
+                    <div></div>
+                )
+            }
+            <div style={{ marginLeft: "1em", marginTop: "1em" }}>
                 <FormControl sx={{ width: "500px" }}>
                     <Autocomplete
                         freeSolo
