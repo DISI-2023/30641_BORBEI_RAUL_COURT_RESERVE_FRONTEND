@@ -16,7 +16,7 @@ import Form from 'react-bootstrap/Form';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { AddFieldService } from '../services/FieldService';
-import { VacanciesService } from '../services/ReservationService';
+import { CreateReservation, VacanciesService } from '../services/ReservationService';
 import moment from 'moment/moment';
 import { Dialog, DialogTitle, DialogActions } from '@mui/material';
 
@@ -40,6 +40,9 @@ const FieldsPage = () => {
     const [locationId, setLocationId] = useState("");
     const [vacancies, setVacancies] = useState([]);
     const [reservationConfirmation, setReservationConfirmation] = useState(false);
+    const [selectedStartTime, setSelectedStartTime] = useState("")
+    const [selectedEndTime, setSelectedEndTime] = useState("")
+    const [selectedFieldName, setSelectedFieldName] = useState("")
     var filtered = fields.sort(function (a, b) {
         return a.name.localeCompare(b.name)
     });
@@ -86,6 +89,8 @@ const FieldsPage = () => {
     const getVacancies = (fieldName, date) => {
         VacanciesService(fieldName, date, (res) => {
             setVacancies(res.data)
+            console.log(fieldName)
+            console.log(date)
         }, (err) => {
             console.log(err.response.status)
         })
@@ -99,6 +104,12 @@ const FieldsPage = () => {
 
     function handleTimeSlot(e) {
         setReservationConfirmation(true)
+    }
+
+    function setTime(startTime, endTime) {
+        setSelectedStartTime(startTime)
+        setSelectedEndTime(endTime)
+        console.log(selectedStartTime)
     }
 
     const handleConfirmationClose = () => {
@@ -274,7 +285,10 @@ const FieldsPage = () => {
                                             </CardContent>
                                         ) : (
                                             <CardActions>
-                                            <Button size="small" onClick={handleOpen}>Select date</Button>
+                                            <Button size="small" onClick={() => {
+                                                handleOpen()
+                                                setSelectedFieldName(field.name)
+                                            }}>Select date</Button>
                                             <Modal
                                                 open={open}
                                                 onClose={handleClose}
@@ -291,7 +305,8 @@ const FieldsPage = () => {
                                                                 type="date"
                                                                 name="chooseDate"
                                                                 onChange={(e) => {
-                                                                    getVacancies(field.name, e.target.value)
+                                                                    getVacancies(selectedFieldName, e.target.value)
+                                                                    console.log(field.id)
                                                                 }}
                                                             />
                                                         </Form.Group>
@@ -317,7 +332,10 @@ const FieldsPage = () => {
                                                                                 cursor: "pointer"
                                                                             }}
                                                                             value={formatTime(interval.startTime) + '-' + formatTime(interval.endTime)}
-                                                                            onClick={(e) => { handleTimeSlot(e, 'value') }}
+                                                                            onClick={(e) => { 
+                                                                                handleTimeSlot(e, 'value') 
+                                                                                setTime(interval.startTime, interval.endTime)
+                                                                            }}
                                                                         >{formatTime(interval.startTime)}-{formatTime(interval.endTime)}</Button>
 
                                                                     ))
@@ -337,7 +355,13 @@ const FieldsPage = () => {
                                                                                 </DialogTitle>
                                                                                 <DialogActions>
                                                                                     <Button color="error" variant="contained" onClick={handleConfirmationClose}>Cancel</Button>
-                                                                                    <Button color="success" variant="contained" autoFocus>
+                                                                                    <Button color="success" variant="contained" 
+                                                                                        onClick={() => {
+                                                                                            console.log(selectedEndTime)
+                                                                                            console.log(selectedStartTime)
+                                                                                            CreateReservation(selectedStartTime, selectedEndTime, field.name, localStorage.getItem("email"))
+                                                                                        }}
+                                                                                        autoFocus>
                                                                                         Agree
                                                                                     </Button>
                                                                                 </DialogActions>
@@ -399,7 +423,10 @@ const FieldsPage = () => {
                                                                                 cursor: "pointer"
                                                                             }}
                                                                             value={formatTime(interval.startTime) + '-' + formatTime(interval.endTime)}
-                                                                            onClick={(e) => { handleTimeSlot(e, 'value') }}
+                                                                            onClick={(e) => { 
+                                                                                handleTimeSlot(e, 'value')
+                                                                                setTime(interval.startTime, interval.endTime)
+                                                                            }}
                                                                         >{formatTime(interval.startTime)}-{formatTime(interval.endTime)}</Button>
 
                                                                     ))
@@ -419,7 +446,9 @@ const FieldsPage = () => {
                                                                                 </DialogTitle>
                                                                                 <DialogActions>
                                                                                     <Button color="error" variant="contained" onClick={handleConfirmationClose}>Cancel</Button>
-                                                                                    <Button color="success" variant="contained" autoFocus>
+                                                                                    <Button color="success" 
+                                                                                        variant="contained" 
+                                                                                        onClick={() => CreateReservation(selectedStartTime, selectedEndTime, selectedFieldName, localStorage.getItem("email"))} autoFocus>
                                                                                         Agree
                                                                                     </Button>
                                                                                 </DialogActions>
@@ -429,9 +458,7 @@ const FieldsPage = () => {
                                                                         )
                                                                     )
                                                                 }
-
                                                             </div>
-
                                                         )
                                                     }
                                                 </Box>
