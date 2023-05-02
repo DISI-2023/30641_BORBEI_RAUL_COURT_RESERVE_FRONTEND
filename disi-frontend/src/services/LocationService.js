@@ -27,16 +27,16 @@ export function AddLocationService(name, street, number) {
         })
 }
 
-export function GetLocationsService() {
+export function GetLocationsService(callback, errorCallback) {
     axiosInstance.get("/location")
         .then(
             res => {
-                localStorage.setItem("locationList", JSON.stringify(res.data));
-                localStorage.setItem("totalNoLocations", JSON.stringify(res.data.length));
+                if (callback != null)
+                    callback(res)
             }
         )
         .catch(error => {
-            console.log(error);
+            if (errorCallback != null)
+                errorCallback(error)
         })
-    window.location.href = 'http://localhost:3000/loc';
 }

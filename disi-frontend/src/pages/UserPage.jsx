@@ -25,7 +25,6 @@ const UserPage = () => {
 
     return (
         <div className="bg">
-          <Navbar></Navbar>
           <GridGlobalStyled container spacing={2} columns={2} id='changePasswordForm'>
                 <GridColorStyled item xs={4}>
                     <TitleStyled id='changePasswordTitle' style={{ font: "inherit", fontSize: "30px" }}>
