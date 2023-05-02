@@ -13,7 +13,6 @@ const LoginUser = () => {
 
     const handleLogin = async () => {
         try {
-            //LoginService(email, password);
             LoginService(email, password, (res) => {
                 console.log(res.status)
                 if (res.status === 200) {

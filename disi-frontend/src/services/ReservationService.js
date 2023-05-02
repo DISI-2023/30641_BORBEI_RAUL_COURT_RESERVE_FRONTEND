@@ -19,7 +19,7 @@ export function VacanciesService(fieldName, date, callback, errorCallback) {
         })
 }
 
-export function CreateReservation(startTime, endTime, fieldName, userEmail) {
+export function CreateReservation(startTime, endTime, fieldName, userEmail, callback, errorCallback) {
     let credentials = {
         startTime: startTime,
         endTime: endTime,
@@ -30,13 +30,13 @@ export function CreateReservation(startTime, endTime, fieldName, userEmail) {
     axiosInstance.post("/reservation", credentials)
         .then(
             res => {
-                if (res.status !== 404 || res.status !== 400) {
-                    window.location.reload()
-                }
+                if (callback != null)
+                    callback(res)
             }
         )
         .catch(error => {
-            console.log(error);
+            if (errorCallback != null)
+                errorCallback(error)
         })
 }
 
