@@ -17,7 +17,7 @@ export function RegisterClient(email, username, password) {
         })
 }
 
-export function LoginService(email, password) {
+export function LoginService(email, password, callback, errorCallback) {
     let credentials = {
         email: email,
         password: password,
@@ -26,19 +26,13 @@ export function LoginService(email, password) {
     axiosInstance.post("/login", credentials)
         .then(
             res => {
-                if (res.status !== 404 || res.status !== 400) {
-                    if (res.data !== null) {
-                        localStorage.setItem("id", res.data.id)
-                        localStorage.setItem("email", res.data.email)
-                        localStorage.setItem("username", res.data.username)
-                        localStorage.setItem("isAdmin", res.data.isAdmin)
-                        setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 1000);
-                    }
-                }
+                if (callback != null)
+                    callback(res)
             }
         )
         .catch(error => {
-            console.log(error);
+            if (errorCallback != null)
+                errorCallback(error)
         })
 }
 

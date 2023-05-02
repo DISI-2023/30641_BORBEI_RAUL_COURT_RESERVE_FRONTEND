@@ -36,7 +36,9 @@ const FieldsPage = () => {
     const handleOpenAddFieldModal = () => setOpenAddFieldModal(true);
     const handleCloseAddFieldModal = () => setOpenAddFieldModal(false);
     const [locationId, setLocationId] = useState("");
-    var filtered = fields;
+    var filtered = fields.sort(function(a, b) {
+        return a.name.localeCompare(b.name)
+    });
 
     useEffect(() => {
         GetFieldsService((res) => {
@@ -182,8 +184,9 @@ const FieldsPage = () => {
                                     </Typography>
                                 </CardContent>
                                 {
-                                    localStorage.getItem("isAdmin") !== "false" ? (
-                                        <CardContent sx={{ float: "right" }}>
+                                    localStorage.getItem("isAdmin") !== null ? (
+                                        localStorage.getItem("isAdmin") !== "false" ? (
+                                            <CardContent sx={{ float: "right" }}>
                                             <ModeEditIcon
                                                 onClick={() => {
                                                     handleOpenUpdateModal()
@@ -243,9 +246,29 @@ const FieldsPage = () => {
                                                 </Box>
                                             </Modal>
                                         </CardContent>
+                                        ) : (
+                                            <CardActions>
+                                            <Button size="small">Reserve</Button>
+                                            <Button size="small" onClick={handleOpen}>Select date</Button>
+                                            <Modal
+                                                open={open}
+                                                onClose={handleClose}
+                                                aria-labelledby="select-date-title"
+                                                aria-describedby="select-date-description"
+                                            >
+                                                <Box sx={style}>
+                                                    <Typography id="select-date-title" variant="h6" component="h2">
+                                                        Please select a date
+                                                    </Typography>
+                                                    <div id="select-date-description">
+                                                        <DatePicker />
+                                                    </div>
+                                                </Box>
+                                            </Modal>
+                                        </CardActions>
+                                        )
                                     ) : (
                                         <CardActions>
-                                            <Button size="small">Reserve</Button>
                                             <Button size="small" onClick={handleOpen}>Select date</Button>
                                             <Modal
                                                 open={open}
