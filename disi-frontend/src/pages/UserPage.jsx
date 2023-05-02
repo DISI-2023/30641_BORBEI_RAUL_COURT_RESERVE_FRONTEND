@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
 import { TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from '../components/StyledComponents';
 import { Button, Snackbar, Alert } from '@mui/material';
 import {ChangePasswordService} from '../services/UserService';
