@@ -7,7 +7,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { TextField, FormControl, InputLabel, MenuItem, Modal, Box } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { GetFieldsService, UpdateFieldService } from '../services/FieldService';
 import { GetLocationsService } from '../services/LocationService';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -17,6 +16,9 @@ import Form from 'react-bootstrap/Form';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { AddFieldService } from '../services/FieldService';
+import { VacanciesService } from '../services/ReservationService';
+import moment from 'moment/moment';
+import { Dialog, DialogTitle, DialogActions } from '@mui/material';
 
 const FieldsPage = () => {
     const [fields, setFields] = useState([]);
@@ -36,7 +38,9 @@ const FieldsPage = () => {
     const handleOpenAddFieldModal = () => setOpenAddFieldModal(true);
     const handleCloseAddFieldModal = () => setOpenAddFieldModal(false);
     const [locationId, setLocationId] = useState("");
-    var filtered = fields.sort(function(a, b) {
+    const [vacancies, setVacancies] = useState([]);
+    const [reservationConfirmation, setReservationConfirmation] = useState(false);
+    var filtered = fields.sort(function (a, b) {
         return a.name.localeCompare(b.name)
     });
 
@@ -78,6 +82,28 @@ const FieldsPage = () => {
         p: 4,
         borderRadius: "10px"
     };
+
+    const getVacancies = (fieldName, date) => {
+        VacanciesService(fieldName, date, (res) => {
+            setVacancies(res.data)
+        }, (err) => {
+            console.log(err.response.status)
+        })
+    }
+
+    const formatTime = (dateTime) => {
+        var format = "HH:mm"
+        var date = new Date(dateTime)
+        return moment(date).format(format)
+    }
+
+    function handleTimeSlot(e) {
+        setReservationConfirmation(true)
+    }
+
+    const handleConfirmationClose = () => {
+        setReservationConfirmation(false)
+    }
 
     return (
         <div>
@@ -187,68 +213,67 @@ const FieldsPage = () => {
                                     localStorage.getItem("isAdmin") !== null ? (
                                         localStorage.getItem("isAdmin") !== "false" ? (
                                             <CardContent sx={{ float: "right" }}>
-                                            <ModeEditIcon
-                                                onClick={() => {
-                                                    handleOpenUpdateModal()
-                                                    setSelectedFieldId(field.id)
-                                                }}
-                                                sx={{
-                                                    cursor: "pointer",
-                                                    fontSize: "2em"
-                                                }} />
-                                            <DeleteIcon
-                                                onClick={() => {
-                                                    DeleteFieldService(field.id)
-                                                }}
-                                                sx={{
-                                                    cursor: "pointer",
-                                                    fontSize: "2em"
-                                                }} />
+                                                <ModeEditIcon
+                                                    onClick={() => {
+                                                        handleOpenUpdateModal()
+                                                        setSelectedFieldId(field.id)
+                                                    }}
+                                                    sx={{
+                                                        cursor: "pointer",
+                                                        fontSize: "2em"
+                                                    }} />
+                                                <DeleteIcon
+                                                    onClick={() => {
+                                                        DeleteFieldService(field.id)
+                                                    }}
+                                                    sx={{
+                                                        cursor: "pointer",
+                                                        fontSize: "2em"
+                                                    }} />
 
-                                            <Modal
-                                                open={openUpdateModal}
-                                                onClose={handleCloseUpdateModal}
-                                                aria-labelledby="update-modal-title"
-                                                aria-describedby="update-modal-description"
-                                            >
-                                                <Box sx={style}>
-                                                    <Typography id="update-modal-title" variant="h6" component="h2" sx={{ fontWeight: "bolder", marginBottom: "0.5em" }}>
-                                                        Edit field information
-                                                    </Typography>
-                                                    <Form>
-                                                        <Form.Group className="mb-3" controlId="formFieldName">
-                                                            <Form.Label style={{ fontStyle: "italic" }}>Name</Form.Label>
-                                                            <Form.Control type="text" placeholder="Enter another name" onChange={(e) => { setUpdateName(e.target.value) }} />
-                                                        </Form.Group>
+                                                <Modal
+                                                    open={openUpdateModal}
+                                                    onClose={handleCloseUpdateModal}
+                                                    aria-labelledby="update-modal-title"
+                                                    aria-describedby="update-modal-description"
+                                                >
+                                                    <Box sx={style}>
+                                                        <Typography id="update-modal-title" variant="h6" component="h2" sx={{ fontWeight: "bolder", marginBottom: "0.5em" }}>
+                                                            Edit field information
+                                                        </Typography>
+                                                        <Form>
+                                                            <Form.Group className="mb-3" controlId="formFieldName">
+                                                                <Form.Label style={{ fontStyle: "italic" }}>Name</Form.Label>
+                                                                <Form.Control type="text" placeholder="Enter another name" onChange={(e) => { setUpdateName(e.target.value) }} />
+                                                            </Form.Group>
 
-                                                        <Form.Group className="mb-3" controlId="formFieldLocation">
-                                                            <Form.Label style={{ fontStyle: "italic" }}>Location</Form.Label>
-                                                            <Form.Select
-                                                                value={value}
-                                                                onChange={(e) => {
-                                                                    setValue(e.target.value)
+                                                            <Form.Group className="mb-3" controlId="formFieldLocation">
+                                                                <Form.Label style={{ fontStyle: "italic" }}>Location</Form.Label>
+                                                                <Form.Select
+                                                                    value={value}
+                                                                    onChange={(e) => {
+                                                                        setValue(e.target.value)
+                                                                    }}>
+                                                                    <option>Select another location</option>
+                                                                    {
+                                                                        locations.map(location => (
+                                                                            <option value={location.id}>{location.name}</option>
+                                                                        ))
+                                                                    }
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                            <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
+                                                                onClick={() => {
+                                                                    UpdateFieldService(selectedFieldId, updateName, value);
                                                                 }}>
-                                                                <option>Select another location</option>
-                                                                {
-                                                                    locations.map(location => (
-                                                                        <option value={location.id}>{location.name}</option>
-                                                                    ))
-                                                                }
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
-                                                            onClick={() => {
-                                                                UpdateFieldService(selectedFieldId, updateName, value);
-                                                            }}>
-                                                            Submit
-                                                        </Button>
-                                                    </Form>
-                                                </Box>
-                                            </Modal>
-                                        </CardContent>
+                                                                Submit
+                                                            </Button>
+                                                        </Form>
+                                                    </Box>
+                                                </Modal>
+                                            </CardContent>
                                         ) : (
                                             <CardActions>
-                                            <Button size="small">Reserve</Button>
                                             <Button size="small" onClick={handleOpen}>Select date</Button>
                                             <Modal
                                                 open={open}
@@ -261,8 +286,70 @@ const FieldsPage = () => {
                                                         Please select a date
                                                     </Typography>
                                                     <div id="select-date-description">
-                                                        <DatePicker />
+                                                        <Form.Group controlId="chooseDate">
+                                                            <Form.Control
+                                                                type="date"
+                                                                name="chooseDate"
+                                                                onChange={(e) => {
+                                                                    getVacancies(field.name, e.target.value)
+                                                                }}
+                                                            />
+                                                        </Form.Group>
                                                     </div>
+                                                    <br></br>
+                                                    {
+                                                        vacancies.length === 0 ? (
+                                                            <Typography id="no-vacancies" variant="h6" component="h2">
+                                                                There are no available time slots. Try another date.
+                                                            </Typography>
+                                                        ) : (
+                                                            <div>
+                                                                <Typography id="available-vacancies" variant="h6" component="h2">
+                                                                    Available time slots
+                                                                </Typography>
+                                                                {
+                                                                    vacancies.map(interval => (
+                                                                        <Button
+                                                                            variant='outlined'
+                                                                            sx={{
+                                                                                borderColor: "black",
+                                                                                color: "black",
+                                                                                cursor: "pointer"
+                                                                            }}
+                                                                            value={formatTime(interval.startTime) + '-' + formatTime(interval.endTime)}
+                                                                            onClick={(e) => { handleTimeSlot(e, 'value') }}
+                                                                        >{formatTime(interval.startTime)}-{formatTime(interval.endTime)}</Button>
+
+                                                                    ))
+                                                                }
+                                                                {
+                                                                    localStorage.getItem("isAdmin") === null ? (
+                                                                        <div></div>
+                                                                    ) : (
+                                                                        localStorage.getItem("isAdmin") !== "true" ? (
+                                                                            <Dialog
+                                                                                open={reservationConfirmation}
+                                                                                onClose={handleConfirmationClose}
+                                                                                aria-labelledby="confirmation-title"
+                                                                            >
+                                                                                <DialogTitle id="confirmation-title">
+                                                                                    {"Would you like to make a reservation for this date?"}
+                                                                                </DialogTitle>
+                                                                                <DialogActions>
+                                                                                    <Button color="error" variant="contained" onClick={handleConfirmationClose}>Cancel</Button>
+                                                                                    <Button color="success" variant="contained" autoFocus>
+                                                                                        Agree
+                                                                                    </Button>
+                                                                                </DialogActions>
+                                                                            </Dialog>
+                                                                        ) : (
+                                                                            <div></div>
+                                                                        )
+                                                                    )
+                                                                }
+                                                            </div>
+                                                        )
+                                                    }
                                                 </Box>
                                             </Modal>
                                         </CardActions>
@@ -281,8 +368,72 @@ const FieldsPage = () => {
                                                         Please select a date
                                                     </Typography>
                                                     <div id="select-date-description">
-                                                        <DatePicker />
+                                                        <Form.Group controlId="chooseDate">
+                                                            <Form.Control
+                                                                type="date"
+                                                                name="chooseDate"
+                                                                onChange={(e) => {
+                                                                    getVacancies(field.name, e.target.value)
+                                                                }}
+                                                            />
+                                                        </Form.Group>
                                                     </div>
+                                                    <br></br>
+                                                    {
+                                                        vacancies.length === 0 ? (
+                                                            <Typography id="no-vacancies" variant="h6" component="h2">
+                                                                There are no available time slots. Try another date.
+                                                            </Typography>
+                                                        ) : (
+                                                            <div>
+                                                                <Typography id="available-vacancies" variant="h6" component="h2">
+                                                                    Available time slots
+                                                                </Typography>
+                                                                {
+                                                                    vacancies.map(interval => (
+                                                                        <Button
+                                                                            variant='outlined'
+                                                                            sx={{
+                                                                                borderColor: "black",
+                                                                                color: "black",
+                                                                                cursor: "pointer"
+                                                                            }}
+                                                                            value={formatTime(interval.startTime) + '-' + formatTime(interval.endTime)}
+                                                                            onClick={(e) => { handleTimeSlot(e, 'value') }}
+                                                                        >{formatTime(interval.startTime)}-{formatTime(interval.endTime)}</Button>
+
+                                                                    ))
+                                                                }
+                                                                {
+                                                                    localStorage.getItem("isAdmin") === null ? (
+                                                                        <div></div>
+                                                                    ) : (
+                                                                        localStorage.getItem("isAdmin") !== "true" ? (
+                                                                            <Dialog
+                                                                                open={reservationConfirmation}
+                                                                                onClose={handleConfirmationClose}
+                                                                                aria-labelledby="confirmation-title"
+                                                                            >
+                                                                                <DialogTitle id="confirmation-title">
+                                                                                    {"Would you like to make a reservation for this date?"}
+                                                                                </DialogTitle>
+                                                                                <DialogActions>
+                                                                                    <Button color="error" variant="contained" onClick={handleConfirmationClose}>Cancel</Button>
+                                                                                    <Button color="success" variant="contained" autoFocus>
+                                                                                        Agree
+                                                                                    </Button>
+                                                                                </DialogActions>
+                                                                            </Dialog>
+                                                                        ) : (
+                                                                            <div></div>
+                                                                        )
+                                                                    )
+                                                                }
+
+                                                            </div>
+
+                                                        )
+                                                    }
                                                 </Box>
                                             </Modal>
                                         </CardActions>
