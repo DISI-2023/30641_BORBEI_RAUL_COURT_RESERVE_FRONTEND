@@ -16,9 +16,9 @@ import Form from 'react-bootstrap/Form';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { AddFieldService } from '../services/FieldService';
-import { VacanciesService } from '../services/ReservationService';
+import { CreateReservation, VacanciesService } from '../services/ReservationService';
 import moment from 'moment/moment';
-import { Dialog, DialogTitle, DialogActions } from '@mui/material';
+import { Dialog, DialogTitle, DialogActions, Snackbar, Alert } from '@mui/material';
 
 const FieldsPage = () => {
     const [fields, setFields] = useState([]);
@@ -40,6 +40,11 @@ const FieldsPage = () => {
     const [locationId, setLocationId] = useState("");
     const [vacancies, setVacancies] = useState([]);
     const [reservationConfirmation, setReservationConfirmation] = useState(false);
+    const [selectedStartTime, setSelectedStartTime] = useState("")
+    const [selectedEndTime, setSelectedEndTime] = useState("")
+    const [selectedFieldName, setSelectedFieldName] = useState("")
+    const [check, setCheck] = useState("")
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState("")
     var filtered = fields.sort(function (a, b) {
         return a.name.localeCompare(b.name)
     });
@@ -86,6 +91,8 @@ const FieldsPage = () => {
     const getVacancies = (fieldName, date) => {
         VacanciesService(fieldName, date, (res) => {
             setVacancies(res.data)
+            console.log(fieldName)
+            console.log(date)
         }, (err) => {
             console.log(err.response.status)
         })
@@ -101,8 +108,36 @@ const FieldsPage = () => {
         setReservationConfirmation(true)
     }
 
+    function setTime(startTime, endTime) {
+        setSelectedStartTime(startTime)
+        setSelectedEndTime(endTime)
+        console.log(selectedStartTime)
+    }
+
     const handleConfirmationClose = () => {
         setReservationConfirmation(false)
+    }
+
+    const handleReservation = () => {
+        CreateReservation(selectedStartTime, selectedEndTime, selectedFieldName, localStorage.getItem("email"), (res) => {
+            console.log(res.status)
+            if (res.status === 201) {
+                setCheck(true)
+                setTimeout(() => { window.location.reload(); }, 2000);
+            }
+            if (res.status !== 201) {
+                setCheck(false)
+            }
+
+        }, (err) => {
+            console.log(err.response.status)
+            if (err.response.status !== 201) {
+                setCheck(false)
+                //console.log(check)
+            }
+
+        })
+        setIsSnackbarOpen(true)
     }
 
     return (
@@ -274,85 +309,100 @@ const FieldsPage = () => {
                                             </CardContent>
                                         ) : (
                                             <CardActions>
-                                            <Button size="small" onClick={handleOpen}>Select date</Button>
-                                            <Modal
-                                                open={open}
-                                                onClose={handleClose}
-                                                aria-labelledby="select-date-title"
-                                                aria-describedby="select-date-description"
-                                            >
-                                                <Box sx={style}>
-                                                    <Typography id="select-date-title" variant="h6" component="h2">
-                                                        Please select a date
-                                                    </Typography>
-                                                    <div id="select-date-description">
-                                                        <Form.Group controlId="chooseDate">
-                                                            <Form.Control
-                                                                type="date"
-                                                                name="chooseDate"
-                                                                onChange={(e) => {
-                                                                    getVacancies(field.name, e.target.value)
-                                                                }}
-                                                            />
-                                                        </Form.Group>
-                                                    </div>
-                                                    <br></br>
-                                                    {
-                                                        vacancies.length === 0 ? (
-                                                            <Typography id="no-vacancies" variant="h6" component="h2">
-                                                                There are no available time slots. Try another date.
-                                                            </Typography>
-                                                        ) : (
-                                                            <div>
-                                                                <Typography id="available-vacancies" variant="h6" component="h2">
-                                                                    Available time slots
+                                                <Button size="small" onClick={() => {
+                                                    handleOpen()
+                                                    setSelectedFieldName(field.name)
+                                                }}>Select date</Button>
+                                                <Modal
+                                                    open={open}
+                                                    onClose={handleClose}
+                                                    aria-labelledby="select-date-title"
+                                                    aria-describedby="select-date-description"
+                                                >
+                                                    <Box sx={style}>
+                                                        <Typography id="select-date-title" variant="h6" component="h2">
+                                                            Please select a date
+                                                        </Typography>
+                                                        <div id="select-date-description">
+                                                            <Form.Group controlId="chooseDate">
+                                                                <Form.Control
+                                                                    type="date"
+                                                                    name="chooseDate"
+                                                                    onChange={(e) => {
+                                                                        getVacancies(selectedFieldName, e.target.value)
+                                                                        console.log(field.id)
+                                                                    }}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        {
+                                                            vacancies.length === 0 ? (
+                                                                <Typography id="no-vacancies" variant="h6" component="h2">
+                                                                    There are no available time slots. Try another date.
                                                                 </Typography>
-                                                                {
-                                                                    vacancies.map(interval => (
-                                                                        <Button
-                                                                            variant='outlined'
-                                                                            sx={{
-                                                                                borderColor: "black",
-                                                                                color: "black",
-                                                                                cursor: "pointer"
-                                                                            }}
-                                                                            value={formatTime(interval.startTime) + '-' + formatTime(interval.endTime)}
-                                                                            onClick={(e) => { handleTimeSlot(e, 'value') }}
-                                                                        >{formatTime(interval.startTime)}-{formatTime(interval.endTime)}</Button>
+                                                            ) : (
+                                                                <div>
+                                                                    <Typography id="available-vacancies" variant="h6" component="h2">
+                                                                        Available time slots
+                                                                    </Typography>
+                                                                    {
+                                                                        vacancies.map(interval => (
+                                                                            <Button
+                                                                                variant='outlined'
+                                                                                sx={{
+                                                                                    borderColor: "black",
+                                                                                    color: "black",
+                                                                                    cursor: "pointer"
+                                                                                }}
+                                                                                value={formatTime(interval.startTime) + '-' + formatTime(interval.endTime)}
+                                                                                onClick={(e) => {
+                                                                                    handleTimeSlot(e, 'value')
+                                                                                    setTime(interval.startTime, interval.endTime)
+                                                                                }}
+                                                                            >{formatTime(interval.startTime)}-{formatTime(interval.endTime)}</Button>
 
-                                                                    ))
-                                                                }
-                                                                {
-                                                                    localStorage.getItem("isAdmin") === null ? (
-                                                                        <div></div>
-                                                                    ) : (
-                                                                        localStorage.getItem("isAdmin") !== "true" ? (
-                                                                            <Dialog
-                                                                                open={reservationConfirmation}
-                                                                                onClose={handleConfirmationClose}
-                                                                                aria-labelledby="confirmation-title"
-                                                                            >
-                                                                                <DialogTitle id="confirmation-title">
-                                                                                    {"Would you like to make a reservation for this date?"}
-                                                                                </DialogTitle>
-                                                                                <DialogActions>
-                                                                                    <Button color="error" variant="contained" onClick={handleConfirmationClose}>Cancel</Button>
-                                                                                    <Button color="success" variant="contained" autoFocus>
-                                                                                        Agree
-                                                                                    </Button>
-                                                                                </DialogActions>
-                                                                            </Dialog>
-                                                                        ) : (
+                                                                        ))
+                                                                    }
+                                                                    {
+                                                                        localStorage.getItem("isAdmin") === null ? (
                                                                             <div></div>
+                                                                        ) : (
+                                                                            localStorage.getItem("isAdmin") !== "true" ? (
+                                                                                <div>
+                                                                                    <Dialog
+                                                                                        open={reservationConfirmation}
+                                                                                        onClose={handleConfirmationClose}
+                                                                                        aria-labelledby="confirmation-title"
+                                                                                    >
+                                                                                        <DialogTitle id="confirmation-title">
+                                                                                            {"Would you like to make a reservation for this date?"}
+                                                                                        </DialogTitle>
+                                                                                        <DialogActions>
+                                                                                            <Button color="error" variant="contained" onClick={handleConfirmationClose}>Cancel</Button>
+                                                                                            <Button color="success" variant="contained"
+                                                                                                onClick={() => {
+                                                                                                    console.log(selectedEndTime)
+                                                                                                    console.log(selectedStartTime)
+                                                                                                    handleReservation()
+                                                                                                }}
+                                                                                                autoFocus>
+                                                                                                Agree
+                                                                                            </Button>
+                                                                                        </DialogActions>
+                                                                                    </Dialog>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div></div>
+                                                                            )
                                                                         )
-                                                                    )
-                                                                }
-                                                            </div>
-                                                        )
-                                                    }
-                                                </Box>
-                                            </Modal>
-                                        </CardActions>
+                                                                    }
+                                                                </div>
+                                                            )
+                                                        }
+                                                    </Box>
+                                                </Modal>
+                                            </CardActions>
                                         )
                                     ) : (
                                         <CardActions>
@@ -399,7 +449,10 @@ const FieldsPage = () => {
                                                                                 cursor: "pointer"
                                                                             }}
                                                                             value={formatTime(interval.startTime) + '-' + formatTime(interval.endTime)}
-                                                                            onClick={(e) => { handleTimeSlot(e, 'value') }}
+                                                                            onClick={(e) => {
+                                                                                handleTimeSlot(e, 'value')
+                                                                                setTime(interval.startTime, interval.endTime)
+                                                                            }}
                                                                         >{formatTime(interval.startTime)}-{formatTime(interval.endTime)}</Button>
 
                                                                     ))
@@ -419,7 +472,11 @@ const FieldsPage = () => {
                                                                                 </DialogTitle>
                                                                                 <DialogActions>
                                                                                     <Button color="error" variant="contained" onClick={handleConfirmationClose}>Cancel</Button>
-                                                                                    <Button color="success" variant="contained" autoFocus>
+                                                                                    <Button color="success"
+                                                                                        variant="contained"
+                                                                                        onClick={() => {
+                                                                                            handleReservation()
+                                                                                        }} autoFocus>
                                                                                         Agree
                                                                                     </Button>
                                                                                 </DialogActions>
@@ -429,9 +486,7 @@ const FieldsPage = () => {
                                                                         )
                                                                     )
                                                                 }
-
                                                             </div>
-
                                                         )
                                                     }
                                                 </Box>
@@ -444,6 +499,33 @@ const FieldsPage = () => {
                     ))
                 }
             </div>
+            {
+                check === true ? (
+                    <Snackbar
+                        id='reservationSuccessful'
+                        open={isSnackbarOpen}
+                        autoHideDuration={6000}
+                        onClose={() => { setIsSnackbarOpen(false) }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    >
+                        <Alert id='reservationSuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='success' sx={{ width: '100%' }}>
+                            You've successfully reserved the selected tennis field!
+                        </Alert>
+                    </Snackbar>
+                ) : (
+                    <Snackbar
+                        id='reservationUnsuccessful'
+                        open={isSnackbarOpen}
+                        autoHideDuration={6000}
+                        onClose={() => { setIsSnackbarOpen(false) }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    >
+                        <Alert id='reservationUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
+                            Hmm... Something went wrong.
+                        </Alert>
+                    </Snackbar>
+                )
+            }
         </div >
     )
 
