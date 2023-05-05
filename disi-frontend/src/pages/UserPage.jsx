@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
 import { TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from '../components/StyledComponents';
 import { Button, Snackbar, Alert } from '@mui/material';
 import {ChangePasswordService} from '../services/UserService';
@@ -24,8 +23,7 @@ const UserPage = () => {
     };
 
     return (
-        <div className="bg">
-          <Navbar></Navbar>
+        <div className="bg" style={{height: "100%"}}>
           <GridGlobalStyled container spacing={2} columns={2} id='changePasswordForm'>
                 <GridColorStyled item xs={4}>
                     <TitleStyled id='changePasswordTitle' style={{ font: "inherit", fontSize: "30px" }}>

@@ -1,10 +1,9 @@
 import axiosInstance from "../axios";
 
-export function AddLocationService(name, street, number) {
+export function AddLocation(latitude, longitude) {
     let credentials = {
-        name: name,
-        street: street,
-        number: number,
+        latitude: latitude,
+        longitude: longitude,
     }
 
     axiosInstance.post("/location", credentials)
@@ -15,29 +14,53 @@ export function AddLocationService(name, street, number) {
         .catch(error => {
             console.log(error);
         })
-    axiosInstance.get("/location")
-        .then(
-            res => {
-                localStorage.setItem("locationList", JSON.stringify(res.data));
-                localStorage.setItem("totalNoLocations", JSON.stringify(res.data.length));
-            }
-        )
-        .catch(error => {
-            console.log(error);
-        })
-    window.location.href = 'http://localhost:3000/loc';
 }
 
-export function GetLocationsService() {
+export function GetLocationsService(callback, errorCallback) {
     axiosInstance.get("/location")
         .then(
             res => {
-                localStorage.setItem("locationList", JSON.stringify(res.data));
-                localStorage.setItem("totalNoLocations", JSON.stringify(res.data.length));
+                if (callback != null)
+                    callback(res)
+            }
+        )
+        .catch(error => {
+            if (errorCallback != null)
+                errorCallback(error)
+        })
+}
+
+export function UpdateLocation(id, name, street, number) {
+    let credentials = {
+        id: id,
+        name: name,
+        street: street,
+        number: number,
+    }
+
+    axiosInstance.put("/location", credentials)
+        .then(
+            res => {
+                if (res.status === 200) {
+                    window.location.reload()
+                }
             }
         )
         .catch(error => {
             console.log(error);
         })
-    window.location.href = 'http://localhost:3000/loc';
+}
+
+export function DeleteLocation(id) {
+    axiosInstance.delete("/location/" + id)
+        .then(
+            res => {
+                if (res.status !== 404 || res.status !== 400) {
+                    window.location.reload()
+                }
+            }
+        )
+        .catch(error => {
+            console.log(error);
+        })
 }

@@ -1,18 +1,44 @@
 import React, { useState } from 'react';
-import { Button,IconButton, Tooltip, Typography, Link } from '@mui/material';
+import { Button, IconButton, Tooltip, Typography, Link } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { TextFieldRegisterUserStyled, GridGlobalStyled, TitleStyled, GridColorStyled, GridStyled } from './StyledComponents';
-import {LoginService} from '../services/UserService';
+import { LoginService } from '../services/UserService';
+import { Snackbar, Alert } from '@mui/material';
 
 const LoginUser = () => {
     const [email, setEmail] = useState(0);
     const [password, setPassword] = useState(0);
+    const [check, setCheck] = useState(true);
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
     const handleLogin = async () => {
         try {
-            LoginService(email, password);
+            LoginService(email, password, (res) => {
+                console.log(res.status)
+                if (res.status === 200) {
+                    localStorage.setItem("id", res.data.id)
+                    localStorage.setItem("username", res.data.username)
+                    localStorage.setItem("email", res.data.email)
+                    localStorage.setItem("isAdmin", res.data.isAdmin)
+                    setCheck(true)
+                    setTimeout(() => { window.location.href = 'http://localhost:3000/'; }, 2000);
+                }
+                if (res.status !== 200) {
+                    setCheck(false)
+                }
+                //console.log(check)
+
+            }, (err) => {
+                console.log(err.response.status)
+                if (err.response.status === 404) {
+                    setCheck(false)
+                    //console.log(check)
+                }
+
+            })
+            setIsSnackbarOpen(true)
         } catch (e) {
-            console.log(e.data);
+            console.log(e.data)
         }
     }
 
@@ -56,9 +82,9 @@ const LoginUser = () => {
                     </Tooltip>
                 </GridColorStyled>
                 <GridStyled item xs={4}>
-                    <Button variant='contained' 
-                            style={{ borderRadius: "2em" }}
-                            onClick={handleLogin}>
+                    <Button variant='contained'
+                        style={{ borderRadius: "2em" }}
+                        onClick={handleLogin}>
                         Sign in
                     </Button>
                 </GridStyled>
@@ -73,6 +99,34 @@ const LoginUser = () => {
                     </Link>
                 </GridStyled>
             </GridGlobalStyled>
+            {
+                check === true ? (
+                    <Snackbar
+                        id='loginUserSuccessful'
+                        open={isSnackbarOpen}
+                        autoHideDuration={6000}
+                        onClose={() => { setIsSnackbarOpen(false) }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    >
+                        <Alert id='loginUserSuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='success' sx={{ width: '100%' }}>
+                            Welcome to Court Reserve!
+                        </Alert>
+                    </Snackbar>
+                ) : (
+                    <Snackbar
+                        id='loginUserUnsuccessful'
+                        open={isSnackbarOpen}
+                        autoHideDuration={6000}
+                        onClose={() => { setIsSnackbarOpen(false) }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    >
+                        <Alert id='loginUserUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
+                            Your email or password is incorrect
+                        </Alert>
+                    </Snackbar>
+                )
+            }
+
         </div>
     )
 }
