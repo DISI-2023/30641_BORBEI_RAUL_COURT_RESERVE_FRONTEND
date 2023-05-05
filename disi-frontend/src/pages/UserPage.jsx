@@ -23,7 +23,7 @@ const UserPage = () => {
     };
 
     return (
-        <div className="bg">
+        <div className="bg" style={{height: "100%"}}>
           <GridGlobalStyled container spacing={2} columns={2} id='changePasswordForm'>
                 <GridColorStyled item xs={4}>
                     <TitleStyled id='changePasswordTitle' style={{ font: "inherit", fontSize: "30px" }}>

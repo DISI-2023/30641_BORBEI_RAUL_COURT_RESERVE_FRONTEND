@@ -2,6 +2,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Dropdown } from 'react-bootstrap';
 
 function NavigationBar() {
   const handleLogout = () => {
@@ -26,9 +27,21 @@ function NavigationBar() {
             <Nav style={{ marginRight: "1%" }}>
               {
                 localStorage.getItem("isAdmin") === "false" ? (
-                  <Nav.Link href="/user">
-                    <AccountCircleIcon />
-                  </Nav.Link>
+                  <Dropdown align="end" variant="light" >
+                    <div style={{ display: "inline-flex" }}>
+                      <Nav.Link>
+                        <AccountCircleIcon />
+                      </Nav.Link>
+                      <Dropdown.Toggle id="dropdown-user" style={{ border: "none", background: "transparent", color: "gray", marginLeft: "-1em" }}>
+                      </Dropdown.Toggle>
+                      
+                    </div>
+                    <Dropdown.Menu>
+                      <Dropdown.Item href="/user">Change password</Dropdown.Item>
+                      <Dropdown.Item href="/reservations">My reservations</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+
                 ) : (
                   <div></div>
                 )

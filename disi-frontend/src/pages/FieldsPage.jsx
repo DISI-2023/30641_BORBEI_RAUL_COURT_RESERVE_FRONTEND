@@ -25,6 +25,7 @@ const FieldsPage = () => {
     const [locations, setLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState("");
     const [name, setName] = useState("");
+    const [imageURL, setImageURL] = useState("");
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -79,7 +80,7 @@ const FieldsPage = () => {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 400,
+        width: 500,
         height: 400,
         backgroundColor: 'white',
         border: '2px solid #000',
@@ -163,7 +164,7 @@ const FieldsPage = () => {
                             aria-describedby="add-field-modal-description"
                         >
                             <Box sx={style}>
-                                <Typography id="add-field-modal-title" variant="h6" component="h2" sx={{ fontWeight: "bolder", marginBottom: "0.5em" }}>
+                                <Typography id="add-field-modal-title" variant="h6" component="h2" sx={{ fontWeight: "bolder" }}>
                                     Add field information
                                 </Typography>
                                 <Form>
@@ -187,9 +188,13 @@ const FieldsPage = () => {
                                             }
                                         </Form.Select>
                                     </Form.Group>
-                                    <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
+                                    <Form.Group className="mb-3" controlId="formFieldImage">
+                                        <Form.Label style={{ fontStyle: "italic" }}>Image</Form.Label>
+                                        <Form.Control type="text" placeholder="Enter image URL" onChange={(e) => { setImageURL(e.target.value) }} />
+                                    </Form.Group>
+                                    <Button variant="contained" sx={{ display: "flex", marginTop: "3em"}}
                                         onClick={() => {
-                                            AddFieldService(name, locationId);
+                                            AddFieldService(name, locationId, imageURL);
                                         }}>
                                         Submit
                                     </Button>
@@ -327,6 +332,7 @@ const FieldsPage = () => {
                                                             <Form.Group controlId="chooseDate">
                                                                 <Form.Control
                                                                     type="date"
+                                                                    min={new Date().toJSON().slice(0, 10)}
                                                                     name="chooseDate"
                                                                     onChange={(e) => {
                                                                         getVacancies(selectedFieldName, e.target.value)
