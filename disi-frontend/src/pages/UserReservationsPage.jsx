@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { GetUserReservations } from '../services/ReservationService'
-import { Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material'
+import { CancelReservation, GetUserReservations } from '../services/ReservationService'
+import { Accordion, Typography, AccordionSummary, AccordionDetails, Snackbar, Alert } from '@mui/material'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import { ChevronDown } from 'react-feather'
 import moment from 'moment/moment'
+import { Button } from '@mui/material'
 
 function UserReservationsPage() {
     const userId = localStorage.getItem("id")
     const [userReservations, setUserReservations] = useState([])
-
-    const [value, setValue] = React.useState('past');
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+    const [value, setValue] = React.useState('future');
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -41,42 +42,76 @@ function UserReservationsPage() {
     function UsersReservationsList(props) {
         return (
             <div>
-            {
-                props.userReservations?.map((reservation) => (
-                    <Accordion>
-                        <AccordionSummary
-                            expandIcon={<ChevronDown />}
-                            aria-controls={"reservation-" + reservation.id + "-content"}
-                            id={"reservation-" + reservation.id + "-header"}
-                        >
-                            <Typography sx={{ fontWeight: "bolder", fontStyle: "italic", fontSize: "20px" }}>{"Reservation for " + reservation.fieldName}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "20px" }}>
-                                <div style={{ display: "inline-flex", gap: "20px" }}>
-                                    <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>
-                                        Field name
-                                    </Typography>
-                                    <Typography>
-                                        {reservation.fieldName}
-                                    </Typography>
+                {
+                    props.userReservations?.map((reservation) => (
+                        <Accordion>
+                            <AccordionSummary
+                                expandIcon={<ChevronDown />}
+                                aria-controls={"reservation-" + reservation.id + "-content"}
+                                id={"reservation-" + reservation.id + "-header"}
+                            >
+                                <Typography sx={{ fontWeight: "bolder", fontStyle: "italic", fontSize: "20px" }}>
+                                    {"Reservation for " + reservation.fieldName + " on " + formatDate(reservation.startTime)}
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "20px" }}>
+                                    <div style={{ display: "inline-flex", gap: "20px" }}>
+                                        <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>
+                                            Field name
+                                        </Typography>
+                                        <Typography>
+                                            {reservation.fieldName}
+                                        </Typography>
+                                    </div>
+                                    <div style={{ display: "inline-flex", gap: "20px" }}>
+                                        <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Starts on</Typography><Typography>{formatDate(reservation.startTime)}</Typography>
+                                        <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>at</Typography><Typography>{formatTime(reservation.startTime)}</Typography>
+                                    </div>
+                                    <div style={{ display: "inline-flex", gap: "20px" }}>
+                                        <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Ends on</Typography><Typography>{formatDate(reservation.endTime)}</Typography>
+                                        <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>at</Typography><Typography>{formatTime(reservation.endTime)}</Typography>
+                                    </div>
+                                    <div style={{ display: "inline-flex", gap: "20px" }}>
+                                        <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Total</Typography><Typography>{reservation.finalPrice}</Typography>
+                                    </div>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => {
+                                            CancelReservation(reservation.id, (res) => {
+                                                if (res.status === 200) {
+                                                    window.location.reload()
+                                                }
+                                            }, (err) => {
+                                                if (err.response.status === 304) {
+                                                    setIsSnackbarOpen(true)
+                                                }
+                                                console.log(err)
+                                            })
+                                        }}
+                                        sx={{
+                                            width: "fit-content",
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
                                 </div>
-                                <div style={{ display: "inline-flex", gap: "20px" }}>
-                                    <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Starts on</Typography><Typography>{formatDate(reservation.startTime)}</Typography>
-                                    <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>at</Typography><Typography>{formatTime(reservation.startTime)}</Typography>
-                                </div>
-                                <div style={{ display: "inline-flex", gap: "20px" }}>
-                                    <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Ends on</Typography><Typography>{formatDate(reservation.endTime)}</Typography>
-                                    <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>at</Typography><Typography>{formatTime(reservation.endTime)}</Typography>
-                                </div>
-                                <div style={{ display: "inline-flex", gap: "20px" }}>
-                                    <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Total</Typography><Typography>{reservation.finalPrice}</Typography>
-                                </div>
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
-                ))
-            }
+                            </AccordionDetails>
+                        </Accordion>
+                    ))
+                }
+                <Snackbar
+                    id='cancelReservationUnsuccessful'
+                    open={isSnackbarOpen}
+                    autoHideDuration={6000}
+                    onClose={() => { setIsSnackbarOpen(false) }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <Alert id='cancelReservationUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
+                        A reservation can be canceled only with minimum of 24h in advance
+                    </Alert>
+                </Snackbar>
             </div>
         )
     }
