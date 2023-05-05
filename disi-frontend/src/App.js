@@ -9,6 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import NavigationBar from './components/NavigationBar';
 import FieldsPage from './pages/FieldsPage';
 import UserReservationsPage from './pages/UserReservationsPage';
+import LocationsPage from './pages/LocationsPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route exact path="/reservations" element={localStorage.getItem("isAdmin") !== null && localStorage.getItem("isAdmin") === "false" ? <UserReservationsPage /> :<Navigate to="/" />} />
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/fields" element={<FieldsPage />} />
+          <Route exact path="/locations" element={<LocationsPage />} />
         </Switch>
       </Router>
     </LocalizationProvider>)
