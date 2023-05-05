@@ -1,9 +1,10 @@
 import axiosInstance from "../axios";
 
-export function AddFieldService(name, locationId) {
+export function AddFieldService(name, locationId, imageURL) {
     let credentials = {
         name: name,
         locationId: locationId,
+        imageUrl: imageURL
     }
 
     axiosInstance.post("/field", credentials)
