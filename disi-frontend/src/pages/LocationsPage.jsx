@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api'
-import { AddLocation, GetLocationsService } from '../services/LocationService';
+import { AddLocation, DeleteLocation, GetLocationsService } from '../services/LocationService';
 import { Form, Button } from 'react-bootstrap';
 import { UpdateLocation } from '../services/LocationService';
 
@@ -21,11 +21,13 @@ function Map() {
     }, [])
 
     const onMapClick = (e) => {
-        AddLocation(e.latLng.lat(), e.latLng.lng())
-        window.location.reload()
+        if (localStorage.getItem("isAdmin") === "true") {
+            AddLocation(e.latLng.lat(), e.latLng.lng())
+            window.location.reload()
+        }
     };
 
-    const { isLoaded } = useLoadScript({ googleMapsApiKey: "AIzaSyBSF_sTNXu3IBPJnlpdmNe1iQcjCoA7a-o" })
+    const { isLoaded } = useLoadScript({ googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY })
     return (isLoaded && (
         <>
             <GoogleMap
@@ -57,12 +59,13 @@ function Map() {
                     selectedMarker !== "" ? (
                         <>
                             {
-                                selectedMarker.name === "" ? (
+                                selectedMarker.name === "" && localStorage.getItem("isAdmin") === "true" ? (
                                     <InfoWindow
                                         position={{
                                             lat: selectedMarker.latitude,
                                             lng: selectedMarker.longitude
                                         }}
+                                        onCloseClick={() => {window.location.reload()}}
                                     >
                                         <Form>
                                             <Form.Group className="mb-3" controlId="locationName">
@@ -77,13 +80,19 @@ function Map() {
                                                 <Form.Label>Number</Form.Label>
                                                 <Form.Control type="text" placeholder="Enter street number" onChange={(e) => setNumber(e.target.value)} />
                                             </Form.Group>
-                                            <Button variant="primary" type="submit" onClick={() => {
-                                                UpdateLocation(selectedMarker.id, name, street, number)
-                                            }}>
-                                                Submit
-                                            </Button>
+                                            <div style={{ display: "inline-flex", gap: "10px" }}>
+                                                <Button variant="primary" type="submit" onClick={() => {
+                                                    UpdateLocation(selectedMarker.id, name, street, number)
+                                                }}>
+                                                    Submit
+                                                </Button>
+                                                <Button variant="primary" type="submit" onClick={() => {
+                                                    DeleteLocation(selectedMarker.id)
+                                                }}>
+                                                    Remove
+                                                </Button>
+                                            </div>
                                         </Form>
-
                                     </InfoWindow>
                                 ) : (
                                     <InfoWindow
@@ -91,6 +100,7 @@ function Map() {
                                             lat: selectedMarker.latitude,
                                             lng: selectedMarker.longitude
                                         }}
+                                        onCloseClick={() => {window.location.reload()}}
                                     >
                                         <div>
                                             <p>
@@ -111,6 +121,7 @@ function Map() {
                                             lat: selectedMarker.latitude,
                                             lng: selectedMarker.longitude
                                         }}
+                                        onCloseClick={() => {window.location.reload()}}
                                     >
                                         <div>
                                             <p>
@@ -128,21 +139,6 @@ function Map() {
                         </>
                     ) : (
                         <></>
-                        // <InfoWindow
-                        //     position={{
-                        //         lat: selectedMarker.latitude,
-                        //         lng: selectedMarker.longitude
-                        //     }}
-                        // >
-                        //     <div>
-                        //         <h1>
-                        //             {selectedMarker.name}
-                        //         </h1>
-                        //         <h2>
-                        //             {selectedMarker.street} {selectedMarker.number}
-                        //         </h2>
-                        //     </div>
-                        // </InfoWindow>
                     )
                 }
 

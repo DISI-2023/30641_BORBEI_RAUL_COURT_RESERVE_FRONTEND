@@ -50,3 +50,17 @@ export function UpdateLocation(id, name, street, number) {
             console.log(error);
         })
 }
+
+export function DeleteLocation(id) {
+    axiosInstance.delete("/location/" + id)
+        .then(
+            res => {
+                if (res.status !== 404 || res.status !== 400) {
+                    window.location.reload()
+                }
+            }
+        )
+        .catch(error => {
+            console.log(error);
+        })
+}
