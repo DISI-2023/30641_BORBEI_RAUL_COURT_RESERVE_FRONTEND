@@ -10,6 +10,7 @@ import NavigationBar from './components/NavigationBar';
 import FieldsPage from './pages/FieldsPage';
 import UserReservationsPage from './pages/UserReservationsPage';
 import UserSubscriptionsPage from './pages/UserSubscriptionsPage';
+import LocationsPage from './pages/LocationsPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route exact path="/subscriptions" element={localStorage.getItem("isAdmin") !== null && localStorage.getItem("isAdmin") === "false" ? <UserSubscriptionsPage /> : <Navigate to="/" />} />
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/fields" element={<FieldsPage />} />
+          <Route exact path="/locations" element={<LocationsPage />} />
         </Switch>
       </Router>
     </LocalizationProvider>)
