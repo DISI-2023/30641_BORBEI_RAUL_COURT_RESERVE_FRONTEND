@@ -96,6 +96,27 @@ function UserReservationsPage() {
                                     >
                                         Cancel
                                     </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => {
+                                            CancelReservation(reservation.id, (res) => {
+                                                if (res.status === 200) {
+                                                    window.location.reload()
+                                                }
+                                            }, (err) => {
+                                                if (err.response.status === 304) {
+                                                    setIsSnackbarOpen(true)
+                                                }
+                                                console.log(err)
+                                            })
+                                        }}
+                                        sx={{
+                                            width: "fit-content",
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
                                 </div>
                             </AccordionDetails>
                         </Accordion>

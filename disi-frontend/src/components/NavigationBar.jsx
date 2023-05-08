@@ -40,6 +40,7 @@ function NavigationBar() {
                       <Dropdown.Item href="/user">Change password</Dropdown.Item>
                       <Dropdown.Item href="/reservations">My reservations</Dropdown.Item>
                       <Dropdown.Item href="/subscriptions">My subscriptions</Dropdown.Item>
+                      <Dropdown.Item href="/requests">My requests</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
 
