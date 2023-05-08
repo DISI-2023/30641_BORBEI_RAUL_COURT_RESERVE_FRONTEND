@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -7,7 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { TextField, FormControl, InputLabel, MenuItem, Modal, Box } from '@mui/material';
+import { TextField, FormControl, Modal, Box } from '@mui/material';
 import { GetFieldsService, UpdateFieldService } from '../services/FieldService';
 import { GetLocationsService } from '../services/LocationService';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -20,8 +19,9 @@ import { AddFieldService } from '../services/FieldService';
 import { CreateReservation, VacanciesService } from '../services/ReservationService';
 import { CreateSubscription } from '../services/SubscriptionService';
 import moment from 'moment/moment';
-import { Dialog, DialogTitle, DialogActions, Snackbar, Alert } from '@mui/material';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { Dialog, DialogTitle, DialogActions, Snackbar, Alert, DialogContent, DialogContentText } from '@mui/material';
+import { GetTariffsByField, UpdateTariff } from '../services/TariffService';
+import axiosInstance from "../axios";
 
 const FieldsPage = () => {
     const [fields, setFields] = useState([]);
@@ -38,6 +38,7 @@ const FieldsPage = () => {
     const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
     const [value, setValue] = useState("");
     const [updateName, setUpdateName] = useState("");
+    const [updateImageURL, setUpdateImageURL] = useState("");
     const [selectedFieldId, setSelectedFieldId] = useState("");
     const handleOpenUpdateModal = () => setOpenUpdateModal(true);
     const handleCloseUpdateModal = () => setOpenUpdateModal(false);
@@ -54,7 +55,9 @@ const FieldsPage = () => {
     const [checkSubscription, setCheckSubscription] = useState("")
     const [fixedTime, setFixedTime] = useState("")
     const [isSnackbarOpen, setIsSnackbarOpen] = useState("")
-
+    const [price, setPrice] = useState(0.0)
+    const [openPricing, setOpenPricing] = useState(false)
+    const [fieldTariffs, setFieldTariffs] = useState([])
     const [subscriptionFieldName, setSubscriptionFieldName] = useState("");
     const [subscriptionDay, setSubscriptionDay] = useState("");
     const [subscriptionStartDate, setSubscriptionStartDate] = useState("");
@@ -66,6 +69,36 @@ const FieldsPage = () => {
     var filtered = fields.sort(function (a, b) {
         return a.name.localeCompare(b.name)
     });
+
+    var filteredLocations = locations.filter(location => {
+        return location.name !== "";
+    });
+    const labels = [
+        'Hourly', 'Weekly', 'Monthly', 'Annually'
+    ]
+    const sortByObject = labels
+        .reduce((obj, item, index) => {
+            return {
+                ...obj,
+                [item]: index,
+            };
+        }, {});
+    var fieldTariffsSort = fieldTariffs.sort((a, b) => sortByObject[a.type] - sortByObject[b.type]);
+    useEffect(() => {
+        GetFieldsService((res) => {
+            console.log(res)
+            setFields(res.data)
+        }, (err) => {
+            console.log(err)
+        })
+
+        GetLocationsService((res) => {
+            console.log(res)
+            setLocations(res.data)
+        }, (err) => {
+            console.log(err)
+        })
+    }, [])
 
     const [minTime, setMinTime] = useState("10:00");
     const [maxTime, setMaxTime] = useState("22:00");
@@ -117,7 +150,7 @@ const FieldsPage = () => {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 500,
-        height: 400,
+        height: 'fit-content',
         backgroundColor: 'white',
         border: '2px solid #000',
         boxShadow: 24,
@@ -196,6 +229,12 @@ const FieldsPage = () => {
         CreateSubscription(subscriptionDay.toUpperCase(), subscriptionStartDate, subscriptionEndDate, subscriptionStartHour, subscriptionEndHour, subscriptionType, localStorage.getItem("email"), subscriptionFieldName, (res) => {
             console.log(res.status)
             if (res.status === 201) {
+                axiosInstance.get("/subscription/email", { params: { id: res.data } })
+                    .then(
+                )
+                    .catch(error => {
+
+                    })
                 setCheckSubscription(true)
                 setFixedTime(true)
                 setTimeout(() => { window.location.reload(); }, 2000);
@@ -207,6 +246,7 @@ const FieldsPage = () => {
                 setFixedTime(true)
                 setCheckSubscription(false)
             }
+
         }, (err) => {
             console.log(err.response.status)
             if (err.response.status === 406) {
@@ -218,6 +258,23 @@ const FieldsPage = () => {
             }
         })
         setIsSnackbarOpen(true)
+    }
+
+    const handleOpenPricing = () => {
+        setOpenPricing(true)
+    }
+
+    const handleClosePricing = () => {
+        setOpenPricing(false)
+    }
+
+    const handleTariffsByField = (fieldName) => {
+        GetTariffsByField(fieldName, (res) => {
+            console.log(res)
+            setFieldTariffs(res.data)
+        }, (err) => {
+            console.log(err)
+        })
     }
 
     return (
@@ -261,7 +318,7 @@ const FieldsPage = () => {
                                             }}>
                                             <option>Select a location</option>
                                             {
-                                                locations.map(location => (
+                                                filteredLocations.map(location => (
                                                     <option value={location.id}>{location.name}</option>
                                                 ))
                                             }
@@ -271,7 +328,7 @@ const FieldsPage = () => {
                                         <Form.Label style={{ fontStyle: "italic" }}>Image</Form.Label>
                                         <Form.Control type="text" placeholder="Enter image URL" onChange={(e) => { setImageURL(e.target.value) }} />
                                     </Form.Group>
-                                    <Button variant="contained" sx={{ display: "flex", marginTop: "3em" }}
+                                    <Button variant="contained" sx={{ display: "flex" }}
                                         onClick={() => {
                                             AddFieldService(name, locationId, imageURL);
                                         }}>
@@ -290,7 +347,7 @@ const FieldsPage = () => {
                     <Autocomplete
                         freeSolo
                         id="select-location-label"
-                        options={locations.map((option) => option.name)}
+                        options={filteredLocations.map((option) => option.name)}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -336,6 +393,8 @@ const FieldsPage = () => {
                                                     onClick={() => {
                                                         handleOpenUpdateModal()
                                                         setSelectedFieldId(field.id)
+                                                        setSelectedFieldName(field.name)
+                                                        handleTariffsByField(field.name)
                                                     }}
                                                     sx={{
                                                         cursor: "pointer",
@@ -375,15 +434,57 @@ const FieldsPage = () => {
                                                                     }}>
                                                                     <option>Select another location</option>
                                                                     {
-                                                                        locations.map(location => (
+                                                                        filteredLocations.map(location => (
                                                                             <option value={location.id}>{location.name}</option>
                                                                         ))
                                                                     }
                                                                 </Form.Select>
                                                             </Form.Group>
-                                                            <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
+                                                            <Form.Group className="mb-3" controlId="formFieldImageUrl">
+                                                                <Form.Label style={{ fontStyle: "italic" }}>Image URL</Form.Label>
+                                                                <Form.Control type="text" placeholder="Enter another image URL" onChange={(e) => { setUpdateImageURL(e.target.value) }} />
+                                                            </Form.Group>
+                                                            <Form.Group className="mb-3" controlId="formFieldTariffs" >
+                                                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                    <Form.Label style={{ fontStyle: "italic" }}>Tariffs</Form.Label>
+                                                                    {
+                                                                        fieldTariffsSort.map((tariff, index) => (
+                                                                            <div style={{ display: "inline-flex", gap: "20px" }}>
+                                                                                <div style={{ display: "flex", flexDirection: "column", width: "100px" }}>
+                                                                                    <Form.Text>
+                                                                                        {tariff.type}
+                                                                                    </Form.Text>
+                                                                                </div>
+                                                                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                                    <Form.Control
+                                                                                        type="number"
+                                                                                        placeholder={tariff.price}
+                                                                                        style={{ width: "70px", height: "30px", marginBottom: "10px" }}
+                                                                                        onChange={(e) => {
+                                                                                            setPrice(e.target.value);
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                                    <Button variant="contained" style={{ width: "70px", height: "30px" }}
+                                                                                        key={index}
+                                                                                        onClick={() => {
+                                                                                            if (price !== 0.0)
+                                                                                                UpdateTariff(tariff.type, selectedFieldName, price);
+                                                                                        }}
+                                                                                    >
+                                                                                        Edit
+                                                                                    </Button>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </div>
+
+                                                            </Form.Group>
+                                                            <Button variant="contained" color="success" sx={{ display: "flex" }}
                                                                 onClick={() => {
-                                                                    UpdateFieldService(selectedFieldId, updateName, value);
+                                                                    UpdateFieldService(selectedFieldId, updateName, value, updateImageURL);
                                                                 }}>
                                                                 Submit
                                                             </Button>
@@ -396,11 +497,58 @@ const FieldsPage = () => {
                                                 <Button size="small" onClick={() => {
                                                     handleOpen()
                                                     setSelectedFieldName(field.name)
-                                                }}>Select date</Button>
+                                                }}>Reservation</Button>
                                                 <Button size="small" onClick={() => {
                                                     handleSubcriptionOpen()
                                                     setSubscriptionFieldName(field.name)
                                                 }}>Subscription</Button>
+                                                <Button size="small"
+                                                    style={{ marginLeft: "auto", display: "block" }}
+                                                    onClick={() => {
+                                                        handleOpenPricing()
+                                                        handleTariffsByField(field.name)
+                                                    }}
+                                                >
+                                                    Pricing
+                                                </Button>
+                                                <Dialog
+                                                    open={openPricing}
+                                                    onClose={handleClosePricing}
+                                                    aria-labelledby="pricing-dialog-title"
+                                                    aria-describedby="pricing-dialog-description"
+                                                    fullWidth
+                                                    maxWidth="xs"
+                                                >
+                                                    <DialogTitle id="pricing-dialog-title">
+                                                        Prices
+                                                    </DialogTitle>
+                                                    <DialogContent>
+                                                        <DialogContentText id="pricing-dialog-description" style={{ display: "flex", flexDirection: "column" }}>
+                                                                {
+                                                                    fieldTariffsSort.map((tariff, index) => (
+                                                                        <div style={{ display: "inline-flex", gap: "20px" }}>
+                                                                            <div style={{ display: "flex", flexDirection: "column", width: "100px" }}>
+                                                                                <Form.Text>
+                                                                                    {tariff.type}
+                                                                                </Form.Text>
+                                                                            </div>
+                                                                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                                <Form.Text>
+                                                                                    {tariff.price}$
+                                                                                </Form.Text>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                        </DialogContentText>
+                                                    </DialogContent>
+                                                    <DialogActions style={{justifyContent: "left"}}>
+                                                        <Button onClick={handleClosePricing}
+                                                            variant="outlined"
+                                                            color="error"
+                                                        >Close</Button>
+                                                    </DialogActions>
+                                                </Dialog>
                                                 <Modal
                                                     open={open}
                                                     onClose={handleClose}
@@ -606,7 +754,53 @@ const FieldsPage = () => {
                                         )
                                     ) : (
                                         <CardActions>
-                                            <Button size="small" onClick={handleOpen}>Select date</Button>
+                                            <Button size="small" onClick={handleOpen}>Reservation</Button>
+                                            <Button size="small"
+                                                style={{ marginLeft: "auto", display: "block" }}
+                                                onClick={() => {
+                                                    handleOpenPricing()
+                                                    console.log(field.name)
+                                                    handleTariffsByField(field.name)
+                                                }}
+                                            >
+                                                Pricing
+                                            </Button>
+                                            <Dialog
+                                                open={openPricing}
+                                                onClose={handleClosePricing}
+                                                aria-labelledby="pricing-dialog-title"
+                                                aria-describedby="pricing-dialog-description"
+                                                maxWidth="xs"
+                                                fullWidth
+                                            >
+                                                <DialogTitle id="pricing-dialog-title" fontSize="30px" fontWeight="bold">
+                                                    Prices
+                                                </DialogTitle>
+                                                <DialogContent>
+                                                        <DialogContentText id="pricing-dialog-description" style={{ display: "flex", flexDirection: "column" }}>
+                                                            {
+                                                                fieldTariffsSort.map((tariff, index) => (
+                                                                    <div style={{ display: "inline-flex", gap: "20px" }}>
+                                                                        <div style={{ display: "flex", flexDirection: "column", width: "100px" }}>
+                                                                            <Form.Text>
+                                                                                {tariff.type}
+                                                                            </Form.Text>
+                                                                        </div>
+                                                                        <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                            <Form.Text>
+                                                                                {tariff.price}$
+                                                                            </Form.Text>
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </DialogContentText>
+                                                </DialogContent>
+                                                <DialogActions sx={{ display: "flex", justifyContent: "flex-start" }}>
+                                                    <Button color="error" variant="outlined"
+                                                        onClick={handleClosePricing}>Close</Button>
+                                                </DialogActions>
+                                            </Dialog>
                                             <Modal
                                                 open={open}
                                                 onClose={handleClose}
@@ -622,6 +816,7 @@ const FieldsPage = () => {
                                                             <Form.Control
                                                                 type="date"
                                                                 name="chooseDate"
+                                                                min={new Date().toJSON().slice(0, 10)}
                                                                 onChange={(e) => {
                                                                     getVacancies(field.name, e.target.value)
                                                                 }}
