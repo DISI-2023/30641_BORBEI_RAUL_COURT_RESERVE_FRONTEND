@@ -22,6 +22,7 @@ import { CreateSubscription } from '../services/SubscriptionService';
 import moment from 'moment/moment';
 import { Dialog, DialogTitle, DialogActions, Snackbar, Alert } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import axiosInstance from "../axios";
 
 const FieldsPage = () => {
     const [fields, setFields] = useState([]);
@@ -196,6 +197,12 @@ const FieldsPage = () => {
         CreateSubscription(subscriptionDay.toUpperCase(), subscriptionStartDate, subscriptionEndDate, subscriptionStartHour, subscriptionEndHour, subscriptionType, localStorage.getItem("email"), subscriptionFieldName, (res) => {
             console.log(res.status)
             if (res.status === 201) {
+                axiosInstance.get("/subscription/email", { params: { id: res.data } })
+                    .then(
+                )
+                    .catch(error => {
+
+                    })
                 setCheckSubscription(true)
                 setFixedTime(true)
                 setTimeout(() => { window.location.reload(); }, 2000);
@@ -207,6 +214,7 @@ const FieldsPage = () => {
                 setFixedTime(true)
                 setCheckSubscription(false)
             }
+
         }, (err) => {
             console.log(err.response.status)
             if (err.response.status === 406) {
