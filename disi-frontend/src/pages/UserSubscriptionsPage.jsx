@@ -84,7 +84,9 @@ function UserSubscriptionsPage() {
             padding: "20px",
             maxWidth: "100%"
         }}>
+            <br></br>
             <h1>My subscriptions</h1>
+            <br></br>
             <Box sx={{ width: '100%' }}>
                 <Box>
                     <UsersSubscriptionsList userSubscriptions={userSubscriptions.filter(subscription => {
