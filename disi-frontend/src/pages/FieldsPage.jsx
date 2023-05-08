@@ -373,10 +373,11 @@ const FieldsPage = () => {
                     filtered.map(field => (
                         <div class="child">
                             <Card sx={{ maxWidth: 500, marginTop: '2em', marginBottom: '2em' }}>
-                                <CardMedia
-                                    sx={{ height: 250 }}
-                                    image='field-prototype.jpg'
-                                />
+                            <CardMedia
+                                    sx={{ height: 250, display: "flex", justifyContent: "center", alignItems: "center" }}
+                                >
+                                    <img src={field.imageUrl} style={{ maxWidth: 500, height: 250 }} />
+                            </CardMedia>
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div">
                                         {field.name}
