@@ -732,7 +732,7 @@ const FieldsPage = () => {
                             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                         >
                             <Alert id='subscriptionUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
-                                The start ane end hour need to be at fixed hour
+                                The start and end hour need to be at fixed hour
                             </Alert>
                         </Snackbar>) : (
                             <Snackbar
