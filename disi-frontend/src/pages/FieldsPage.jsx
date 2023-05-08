@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -17,8 +18,10 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { AddFieldService } from '../services/FieldService';
 import { CreateReservation, VacanciesService } from '../services/ReservationService';
+import { CreateSubscription } from '../services/SubscriptionService';
 import moment from 'moment/moment';
 import { Dialog, DialogTitle, DialogActions, Snackbar, Alert } from '@mui/material';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const FieldsPage = () => {
     const [fields, setFields] = useState([]);
@@ -27,8 +30,11 @@ const FieldsPage = () => {
     const [name, setName] = useState("");
     const [imageURL, setImageURL] = useState("");
     const [open, setOpen] = React.useState(false);
+    const [openSubscription, setOpenSubscription] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const handleSubcriptionOpen = () => setOpenSubscription(true);
+    const handleSubscriptionClose = () => setOpenSubscription(false);
     const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
     const [value, setValue] = useState("");
     const [updateName, setUpdateName] = useState("");
@@ -45,10 +51,40 @@ const FieldsPage = () => {
     const [selectedEndTime, setSelectedEndTime] = useState("")
     const [selectedFieldName, setSelectedFieldName] = useState("")
     const [check, setCheck] = useState("")
+    const [checkSubscription, setCheckSubscription] = useState("")
+    const [fixedTime, setFixedTime] = useState("")
     const [isSnackbarOpen, setIsSnackbarOpen] = useState("")
+
+    const [subscriptionFieldName, setSubscriptionFieldName] = useState("");
+    const [subscriptionDay, setSubscriptionDay] = useState("");
+    const [subscriptionStartDate, setSubscriptionStartDate] = useState("");
+    const [subscriptionEndDate, setSubscriptionEndDate] = useState("");
+    const [subscriptionStartHour, setSubscriptionStartHour] = useState("");
+    const [subscriptionEndHour, setSubscriptionEndHour] = useState("");
+    const [subscriptionType, setSubscriptionType] = useState("");
+
     var filtered = fields.sort(function (a, b) {
         return a.name.localeCompare(b.name)
     });
+
+    const [minTime, setMinTime] = useState("10:00");
+    const [maxTime, setMaxTime] = useState("22:00");
+
+    const handleStartTimeChange = (e) => {
+        if (e.target.value < minTime || e.target.value > maxTime) {
+            setSubscriptionStartHour(minTime);
+        } else {
+            setSubscriptionStartHour(e.target.value);
+        }
+    };
+
+    const handleEndTimeChange = (e) => {
+        if (e.target.value > maxTime || e.target.value < minTime) {
+            setSubscriptionEndHour(maxTime);
+        } else {
+            setSubscriptionEndHour(e.target.value);
+        }
+    };
 
     useEffect(() => {
         GetFieldsService((res) => {
@@ -82,6 +118,20 @@ const FieldsPage = () => {
         transform: 'translate(-50%, -50%)',
         width: 500,
         height: 400,
+        backgroundColor: 'white',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+        borderRadius: "10px"
+    };
+
+    const subscriptionStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 500,
+        height: 700,
         backgroundColor: 'white',
         border: '2px solid #000',
         boxShadow: 24,
@@ -133,10 +183,39 @@ const FieldsPage = () => {
         }, (err) => {
             console.log(err.response.status)
             if (err.response.status !== 201) {
+                setFixedTime(true)
                 setCheck(false)
                 //console.log(check)
             }
 
+        })
+        setIsSnackbarOpen(true)
+    }
+
+    const handleSubscription = () => {
+        CreateSubscription(subscriptionDay.toUpperCase(), subscriptionStartDate, subscriptionEndDate, subscriptionStartHour, subscriptionEndHour, subscriptionType, localStorage.getItem("email"), subscriptionFieldName, (res) => {
+            console.log(res.status)
+            if (res.status === 201) {
+                setCheckSubscription(true)
+                setFixedTime(true)
+                setTimeout(() => { window.location.reload(); }, 2000);
+            }
+            else if (res.status === 406) {
+                setFixedTime(false);
+            }
+            else {
+                setFixedTime(true)
+                setCheckSubscription(false)
+            }
+        }, (err) => {
+            console.log(err.response.status)
+            if (err.response.status === 406) {
+                setFixedTime(false);
+            }
+            else {
+                setFixedTime(true)
+                setCheckSubscription(false)
+            }
         })
         setIsSnackbarOpen(true)
     }
@@ -192,7 +271,7 @@ const FieldsPage = () => {
                                         <Form.Label style={{ fontStyle: "italic" }}>Image</Form.Label>
                                         <Form.Control type="text" placeholder="Enter image URL" onChange={(e) => { setImageURL(e.target.value) }} />
                                     </Form.Group>
-                                    <Button variant="contained" sx={{ display: "flex", marginTop: "3em"}}
+                                    <Button variant="contained" sx={{ display: "flex", marginTop: "3em" }}
                                         onClick={() => {
                                             AddFieldService(name, locationId, imageURL);
                                         }}>
@@ -318,6 +397,10 @@ const FieldsPage = () => {
                                                     handleOpen()
                                                     setSelectedFieldName(field.name)
                                                 }}>Select date</Button>
+                                                <Button size="small" onClick={() => {
+                                                    handleSubcriptionOpen()
+                                                    setSubscriptionFieldName(field.name)
+                                                }}>Subscription</Button>
                                                 <Modal
                                                     open={open}
                                                     onClose={handleClose}
@@ -406,6 +489,117 @@ const FieldsPage = () => {
                                                                 </div>
                                                             )
                                                         }
+                                                    </Box>
+                                                </Modal>
+                                                <Modal
+                                                    open={openSubscription}
+                                                    onClose={handleSubscriptionClose}
+                                                    aria-labelledby="select-date-title"
+                                                    aria-describedby="select-date-description"
+                                                >
+                                                    <Box sx={subscriptionStyle}>
+                                                        <Typography id="select-day-title" variant="h6" component="h2">
+                                                            Please select a day
+                                                        </Typography>
+                                                        <Form.Group className="mb-3" controlId="formFieldDay">
+                                                            <Form.Select
+                                                                onChange={(e) => {
+                                                                    setSubscriptionDay(e.target.value)
+                                                                }}>
+                                                                <option value="" disabled selected>Select day</option>
+                                                                <option>Monday</option>
+                                                                <option>Tuesday</option>
+                                                                <option>Wednesday</option>
+                                                                <option>Thursday</option>
+                                                                <option>Friday</option>
+                                                                <option>Saturday</option>
+                                                                <option>Sunday</option>
+                                                            </Form.Select>
+                                                        </Form.Group>
+                                                        <Typography id="select-date-title" variant="h6" component="h2">
+                                                            Select start date
+                                                        </Typography>
+                                                        <div id="select-date-description">
+                                                            <Form.Group controlId="chooseDate">
+                                                                <Form.Control
+                                                                    type="date"
+                                                                    min={new Date().toJSON().slice(0, 10)}
+                                                                    name="chooseDate"
+                                                                    onChange={(e) => {
+                                                                        setSubscriptionStartDate(e.target.value);
+                                                                    }}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-date-title" variant="h6" component="h2">
+                                                            Select end date
+                                                        </Typography>
+                                                        <div id="select-date-description">
+                                                            <Form.Group controlId="chooseDate">
+                                                                <Form.Control
+                                                                    type="date"
+                                                                    min={new Date().toJSON().slice(0, 10)}
+                                                                    name="chooseDate"
+                                                                    onChange={(e) => {
+                                                                        setSubscriptionEndDate(e.target.value);
+                                                                    }}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-hour-title" variant="h6" component="h2">
+                                                            Select start hour
+                                                        </Typography>
+                                                        <div id="select-time-description">
+                                                            <Form.Group controlId="chooseTime">
+                                                                <Form.Control
+                                                                    type="time"
+                                                                    name="chooseTime"
+                                                                    value={subscriptionStartHour}
+                                                                    min={minTime}
+                                                                    onChange={handleStartTimeChange}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-hour-title" variant="h6" component="h2">
+                                                            Select end hour
+                                                        </Typography>
+                                                        <div id="select-time-description">
+                                                            <Form.Group controlId="chooseTime">
+                                                                <Form.Control
+                                                                    type="time"
+                                                                    name="chooseTime"
+                                                                    value={subscriptionEndHour}
+                                                                    max={maxTime}
+                                                                    onChange={handleEndTimeChange}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-type-title" variant="h6" component="h2">
+                                                            Select subscription type
+                                                        </Typography>
+                                                        <Form.Group className="mb-3" controlId="formFieldDay">
+                                                            <Form.Select
+                                                                onChange={(e) => {
+                                                                    setSubscriptionType(e.target.value)
+                                                                }}>
+                                                                <option value="" disabled selected>Select type</option>
+                                                                <option>Weekly</option>
+                                                                <option>Monthly</option>
+                                                                <option>Annually</option>
+                                                            </Form.Select>
+                                                        </Form.Group>
+                                                        <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
+                                                            onClick={() => {
+                                                                handleSubscription()
+                                                            }}
+                                                        >
+                                                            Done
+                                                        </Button>
+                                                        <br></br>
                                                     </Box>
                                                 </Modal>
                                             </CardActions>
@@ -519,17 +713,39 @@ const FieldsPage = () => {
                         </Alert>
                     </Snackbar>
                 ) : (
-                    <Snackbar
-                        id='reservationUnsuccessful'
+                    (checkSubscription === true && fixedTime == true) ? (<Snackbar
+                        id='subscriptionSuccessful'
                         open={isSnackbarOpen}
                         autoHideDuration={6000}
                         onClose={() => { setIsSnackbarOpen(false) }}
                         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                     >
-                        <Alert id='reservationUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
-                            Hmm... Something went wrong.
+                        <Alert id='subscriptionSuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='success' sx={{ width: '100%' }}>
+                            You've successfully subscribed to the selected tennis field!
                         </Alert>
-                    </Snackbar>
+                    </Snackbar>) : (
+                        fixedTime === false ? (<Snackbar
+                            id='subscriptionUnsuccessful'
+                            open={isSnackbarOpen}
+                            autoHideDuration={6000}
+                            onClose={() => { setIsSnackbarOpen(false) }}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        >
+                            <Alert id='subscriptionUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
+                                The start and end hour need to be at fixed hour
+                            </Alert>
+                        </Snackbar>) : (
+                            <Snackbar
+                                id='reservationUnsuccessful'
+                                open={isSnackbarOpen}
+                                autoHideDuration={6000}
+                                onClose={() => { setIsSnackbarOpen(false) }}
+                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            >
+                                <Alert id='reservationUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
+                                    Hmm... Something went wrong.
+                                </Alert>
+                            </Snackbar>))
                 )
             }
         </div >
