@@ -54,7 +54,7 @@ const RegisterUser = () => {
     );
 
     return (
-        <div className="bg">
+        <div className="bg" style={{height: "100%"}}>
             <GridGlobalStyled container spacing={2} columns={2} id='registerForm'>
                 <GridColorStyled item xs={4}>
                     <TitleStyled id='registerFormTitle' style={{ font: "inherit", fontSize: "30px" }}>

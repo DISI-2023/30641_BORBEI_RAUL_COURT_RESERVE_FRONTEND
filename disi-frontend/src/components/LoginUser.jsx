@@ -43,7 +43,7 @@ const LoginUser = () => {
     }
 
     return (
-        <div className='bg'>
+        <div className='bg' style={{height: "100%"}}>
             <GridGlobalStyled container spacing={2} columns={2} id='loginForm'>
                 <GridColorStyled item xs={4}>
                     <TitleStyled id='loginFormTitle' style={{ font: "inherit", fontSize: "30px" }}>
