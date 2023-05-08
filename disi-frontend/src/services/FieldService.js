@@ -48,11 +48,12 @@ export function DeleteFieldService(id) {
         })
 }
 
-export function UpdateFieldService(id, name, locationId) {
+export function UpdateFieldService(id, name, locationId, imageURL) {
     let credentials = {
         id: id,
         name: name,
         locationId: locationId,
+        imageUrl: imageURL
     }
     axiosInstance.put("/field", credentials)
         .then(
