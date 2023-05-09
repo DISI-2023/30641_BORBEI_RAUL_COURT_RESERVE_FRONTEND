@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { CancelReservation, GetUserReservations } from '../services/ReservationService'
+import { AddRequest } from '../services/RequestService'
 import { Accordion, Typography, AccordionSummary, AccordionDetails, Snackbar, Alert } from '@mui/material'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -75,27 +76,50 @@ function UserReservationsPage() {
                                     <div style={{ display: "inline-flex", gap: "20px" }}>
                                         <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Total</Typography><Typography>{reservation.finalPrice}</Typography>
                                     </div>
-                                    <Button
-                                        variant="contained"
-                                        color="error"
-                                        onClick={() => {
-                                            CancelReservation(reservation.id, (res) => {
-                                                if (res.status === 200) {
-                                                    window.location.reload()
-                                                }
-                                            }, (err) => {
-                                                if (err.response.status === 304) {
-                                                    setIsSnackbarOpen(true)
-                                                }
-                                                console.log(err)
-                                            })
-                                        }}
-                                        sx={{
-                                            width: "fit-content",
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
+                                    <div style={{ display: "flex", gap: 12 }}>
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => {
+                                                CancelReservation(reservation.id, (res) => {
+                                                    if (res.status === 200) {
+                                                        window.location.reload()
+                                                    }
+                                                }, (err) => {
+                                                    if (err.response.status === 304) {
+                                                        setIsSnackbarOpen(true)
+                                                    }
+                                                    console.log(err)
+                                                })
+                                            }}
+                                            sx={{
+                                                width: "fit-content",
+                                            }}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            style={{
+                                                color: "white",
+                                                backgroundColor: "primary",
+                                            }}
+                                            onClick={() => {
+                                                console.log(localStorage.getItem("id"))
+                                                AddRequest(false, localStorage.getItem("id"), null, reservation.id, (res) => {
+                                                    if (res.status === 200) {
+                                                        window.location.reload()
+                                                    }
+                                                }, (err) => {
+                                                })
+                                            }}
+                                            sx={{
+                                                width: "fit-content",
+                                            }}
+                                        >
+                                            Partner request
+                                        </Button>
+                                    </div>
                                 </div>
                             </AccordionDetails>
                         </Accordion>
@@ -122,6 +146,8 @@ function UserReservationsPage() {
             maxWidth: "100%"
         }}>
             <h1>My reservations</h1>
+            <br></br>
+            <br></br>
             <Box sx={{ width: '100%' }}>
                 <Box>
                     <Tabs
