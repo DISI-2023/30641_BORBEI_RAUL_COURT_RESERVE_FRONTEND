@@ -21,8 +21,8 @@ export function AddRequest(take_over, postedByUserId, takenByUserId, reservation
         })
 }
 
-export function GetRequests(userId, callback, errorCallback) {
-    axiosInstance.get("/request/" + userId)
+export function GetRequests(callback, errorCallback) {
+    axiosInstance.get("/request/")
         .then(
             res => {
                 if (callback != null)

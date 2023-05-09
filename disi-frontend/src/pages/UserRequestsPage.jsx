@@ -30,7 +30,7 @@ function UserRequestsPage() {
     }
 
     useEffect(() => {
-        GetRequests(userId, (res) => {
+        GetRequests((res) => {
             setUserRequests(res.data)
             console.log(res.data)
         }, (err) => {
@@ -50,7 +50,7 @@ function UserRequestsPage() {
                                 id={"request-" + request.id + "-header"}
                             >
                                 <Typography sx={{ fontWeight: "bolder", fontStyle: "italic", fontSize: "20px" }}>
-                                    {"Request from " + request.postedByUser.email + " on " + formatDate(request.reservation.startTime)}
+                                    {"Request for partner from " + request.postedByUser.email + " on " + formatDate(request.reservation.startTime)}
                                 </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
@@ -88,7 +88,7 @@ function UserRequestsPage() {
                                                 color: "white",
                                                 backgroundColor: "primary",
                                             }}
-                                            disabled={request.takenByUser !== null}
+                                            disabled={request.takenByUser !== null || request.postedByUser.id === localStorage.getItem("id")}
                                             onClick={() => {
                                                 AcceptRequest(request.id, 'false', request.postedByUser.id, localStorage.getItem("id"), request.reservation.id, (res) => {
                                                     if (res.status === 200) {
