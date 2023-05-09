@@ -81,11 +81,6 @@ const HomePage = () => {
                   Locations
                 </button>
               </Link>
-              <Link to="/reservations" style={{marginBottom: "1em", marginLeft: "-1em"}}>
-                <button className='myButton'>
-                  Reservations
-                </button>
-              </Link>
           </div>
         )
       }

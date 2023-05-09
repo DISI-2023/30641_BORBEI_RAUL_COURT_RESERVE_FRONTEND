@@ -6,7 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { TextField, FormControl, InputLabel, MenuItem, Modal, Box } from '@mui/material';
+import { TextField, FormControl, Modal, Box } from '@mui/material';
 import { GetFieldsService, UpdateFieldService } from '../services/FieldService';
 import { GetLocationsService } from '../services/LocationService';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -17,8 +17,12 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { AddFieldService } from '../services/FieldService';
 import { CreateReservation, VacanciesService } from '../services/ReservationService';
+import { CreateSubscription } from '../services/SubscriptionService';
 import moment from 'moment/moment';
-import { Dialog, DialogTitle, DialogActions, Snackbar, Alert } from '@mui/material';
+import { Dialog, DialogTitle, DialogActions, Snackbar, Alert, DialogContent, DialogContentText } from '@mui/material';
+import { GetTariffsByField, UpdateTariff } from '../services/TariffService';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import axiosInstance from "../axios";
 
 const FieldsPage = () => {
     const [fields, setFields] = useState([]);
@@ -27,11 +31,15 @@ const FieldsPage = () => {
     const [name, setName] = useState("");
     const [imageURL, setImageURL] = useState("");
     const [open, setOpen] = React.useState(false);
+    const [openSubscription, setOpenSubscription] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const handleSubcriptionOpen = () => setOpenSubscription(true);
+    const handleSubscriptionClose = () => setOpenSubscription(false);
     const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
     const [value, setValue] = useState("");
     const [updateName, setUpdateName] = useState("");
+    const [updateImageURL, setUpdateImageURL] = useState("");
     const [selectedFieldId, setSelectedFieldId] = useState("");
     const handleOpenUpdateModal = () => setOpenUpdateModal(true);
     const handleCloseUpdateModal = () => setOpenUpdateModal(false);
@@ -45,10 +53,72 @@ const FieldsPage = () => {
     const [selectedEndTime, setSelectedEndTime] = useState("")
     const [selectedFieldName, setSelectedFieldName] = useState("")
     const [check, setCheck] = useState("")
+    const [checkSubscription, setCheckSubscription] = useState("")
+    const [fixedTime, setFixedTime] = useState("")
     const [isSnackbarOpen, setIsSnackbarOpen] = useState("")
+    const [price, setPrice] = useState(0.0)
+    const [openPricing, setOpenPricing] = useState(false)
+    const [fieldTariffs, setFieldTariffs] = useState([])
+    const [subscriptionFieldName, setSubscriptionFieldName] = useState("");
+    const [subscriptionDay, setSubscriptionDay] = useState("");
+    const [subscriptionStartDate, setSubscriptionStartDate] = useState("");
+    const [subscriptionEndDate, setSubscriptionEndDate] = useState("");
+    const [subscriptionStartHour, setSubscriptionStartHour] = useState("");
+    const [subscriptionEndHour, setSubscriptionEndHour] = useState("");
+    const [subscriptionType, setSubscriptionType] = useState("");
+
     var filtered = fields.sort(function (a, b) {
         return a.name.localeCompare(b.name)
     });
+
+    var filteredLocations = locations.filter(location => {
+        return location.name !== "";
+    });
+    const labels = [
+        'Hourly', 'Weekly', 'Monthly', 'Annually'
+    ]
+    const sortByObject = labels
+        .reduce((obj, item, index) => {
+            return {
+                ...obj,
+                [item]: index,
+            };
+        }, {});
+    var fieldTariffsSort = fieldTariffs.sort((a, b) => sortByObject[a.type] - sortByObject[b.type]);
+    useEffect(() => {
+        GetFieldsService((res) => {
+            console.log(res)
+            setFields(res.data)
+        }, (err) => {
+            console.log(err)
+        })
+
+        GetLocationsService((res) => {
+            console.log(res)
+            setLocations(res.data)
+        }, (err) => {
+            console.log(err)
+        })
+    }, [])
+
+    const [minTime, setMinTime] = useState("10:00");
+    const [maxTime, setMaxTime] = useState("22:00");
+
+    const handleStartTimeChange = (e) => {
+        if (e.target.value < minTime || e.target.value > maxTime) {
+            setSubscriptionStartHour(minTime);
+        } else {
+            setSubscriptionStartHour(e.target.value);
+        }
+    };
+
+    const handleEndTimeChange = (e) => {
+        if (e.target.value > maxTime || e.target.value < minTime) {
+            setSubscriptionEndHour(maxTime);
+        } else {
+            setSubscriptionEndHour(e.target.value);
+        }
+    };
 
     useEffect(() => {
         GetFieldsService((res) => {
@@ -81,7 +151,21 @@ const FieldsPage = () => {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 500,
-        height: 400,
+        height: 'fit-content',
+        backgroundColor: 'white',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+        borderRadius: "10px"
+    };
+
+    const subscriptionStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 500,
+        height: 700,
         backgroundColor: 'white',
         border: '2px solid #000',
         boxShadow: 24,
@@ -133,12 +217,65 @@ const FieldsPage = () => {
         }, (err) => {
             console.log(err.response.status)
             if (err.response.status !== 201) {
+                setFixedTime(true)
                 setCheck(false)
                 //console.log(check)
             }
 
         })
         setIsSnackbarOpen(true)
+    }
+
+    const handleSubscription = () => {
+        CreateSubscription(subscriptionDay.toUpperCase(), subscriptionStartDate, subscriptionEndDate, subscriptionStartHour, subscriptionEndHour, subscriptionType, localStorage.getItem("email"), subscriptionFieldName, (res) => {
+            console.log(res.status)
+            if (res.status === 201) {
+                axiosInstance.get("/subscription/email", { params: { id: res.data } })
+                    .then(
+                )
+                    .catch(error => {
+
+                    })
+                setCheckSubscription(true)
+                setFixedTime(true)
+                setTimeout(() => { window.location.reload(); }, 2000);
+            }
+            else if (res.status === 406) {
+                setFixedTime(false);
+            }
+            else {
+                setFixedTime(true)
+                setCheckSubscription(false)
+            }
+
+        }, (err) => {
+            console.log(err.response.status)
+            if (err.response.status === 406) {
+                setFixedTime(false);
+            }
+            else {
+                setFixedTime(true)
+                setCheckSubscription(false)
+            }
+        })
+        setIsSnackbarOpen(true)
+    }
+
+    const handleOpenPricing = () => {
+        setOpenPricing(true)
+    }
+
+    const handleClosePricing = () => {
+        setOpenPricing(false)
+    }
+
+    const handleTariffsByField = (fieldName) => {
+        GetTariffsByField(fieldName, (res) => {
+            console.log(res)
+            setFieldTariffs(res.data)
+        }, (err) => {
+            console.log(err)
+        })
     }
 
     return (
@@ -182,7 +319,7 @@ const FieldsPage = () => {
                                             }}>
                                             <option>Select a location</option>
                                             {
-                                                locations.map(location => (
+                                                filteredLocations.map(location => (
                                                     <option value={location.id}>{location.name}</option>
                                                 ))
                                             }
@@ -192,7 +329,7 @@ const FieldsPage = () => {
                                         <Form.Label style={{ fontStyle: "italic" }}>Image</Form.Label>
                                         <Form.Control type="text" placeholder="Enter image URL" onChange={(e) => { setImageURL(e.target.value) }} />
                                     </Form.Group>
-                                    <Button variant="contained" sx={{ display: "flex", marginTop: "3em"}}
+                                    <Button variant="contained" sx={{ display: "flex" }}
                                         onClick={() => {
                                             AddFieldService(name, locationId, imageURL);
                                         }}>
@@ -211,7 +348,7 @@ const FieldsPage = () => {
                     <Autocomplete
                         freeSolo
                         id="select-location-label"
-                        options={locations.map((option) => option.name)}
+                        options={filteredLocations.map((option) => option.name)}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -236,10 +373,11 @@ const FieldsPage = () => {
                     filtered.map(field => (
                         <div class="child">
                             <Card sx={{ maxWidth: 500, marginTop: '2em', marginBottom: '2em' }}>
-                                <CardMedia
-                                    sx={{ height: 250 }}
-                                    image='field-prototype.jpg'
-                                />
+                            <CardMedia
+                                    sx={{ height: 250, display: "flex", justifyContent: "center", alignItems: "center" }}
+                                >
+                                    <img src={field.imageUrl} style={{ maxWidth: 500, height: 250 }} />
+                            </CardMedia>
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div">
                                         {field.name}
@@ -257,6 +395,8 @@ const FieldsPage = () => {
                                                     onClick={() => {
                                                         handleOpenUpdateModal()
                                                         setSelectedFieldId(field.id)
+                                                        setSelectedFieldName(field.name)
+                                                        handleTariffsByField(field.name)
                                                     }}
                                                     sx={{
                                                         cursor: "pointer",
@@ -296,15 +436,57 @@ const FieldsPage = () => {
                                                                     }}>
                                                                     <option>Select another location</option>
                                                                     {
-                                                                        locations.map(location => (
+                                                                        filteredLocations.map(location => (
                                                                             <option value={location.id}>{location.name}</option>
                                                                         ))
                                                                     }
                                                                 </Form.Select>
                                                             </Form.Group>
-                                                            <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
+                                                            <Form.Group className="mb-3" controlId="formFieldImageUrl">
+                                                                <Form.Label style={{ fontStyle: "italic" }}>Image URL</Form.Label>
+                                                                <Form.Control type="text" placeholder="Enter another image URL" onChange={(e) => { setUpdateImageURL(e.target.value) }} />
+                                                            </Form.Group>
+                                                            <Form.Group className="mb-3" controlId="formFieldTariffs" >
+                                                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                    <Form.Label style={{ fontStyle: "italic" }}>Tariffs</Form.Label>
+                                                                    {
+                                                                        fieldTariffsSort.map((tariff, index) => (
+                                                                            <div style={{ display: "inline-flex", gap: "20px" }}>
+                                                                                <div style={{ display: "flex", flexDirection: "column", width: "100px" }}>
+                                                                                    <Form.Text>
+                                                                                        {tariff.type}
+                                                                                    </Form.Text>
+                                                                                </div>
+                                                                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                                    <Form.Control
+                                                                                        type="number"
+                                                                                        placeholder={tariff.price}
+                                                                                        style={{ width: "70px", height: "30px", marginBottom: "10px" }}
+                                                                                        onChange={(e) => {
+                                                                                            setPrice(e.target.value);
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                                    <Button variant="contained" style={{ width: "70px", height: "30px" }}
+                                                                                        key={index}
+                                                                                        onClick={() => {
+                                                                                            if (price !== 0.0)
+                                                                                                UpdateTariff(tariff.type, selectedFieldName, price);
+                                                                                        }}
+                                                                                    >
+                                                                                        Edit
+                                                                                    </Button>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </div>
+
+                                                            </Form.Group>
+                                                            <Button variant="contained" color="success" sx={{ display: "flex" }}
                                                                 onClick={() => {
-                                                                    UpdateFieldService(selectedFieldId, updateName, value);
+                                                                    UpdateFieldService(selectedFieldId, updateName, value, updateImageURL);
                                                                 }}>
                                                                 Submit
                                                             </Button>
@@ -317,7 +499,58 @@ const FieldsPage = () => {
                                                 <Button size="small" onClick={() => {
                                                     handleOpen()
                                                     setSelectedFieldName(field.name)
-                                                }}>Select date</Button>
+                                                }}>Reservation</Button>
+                                                <Button size="small" onClick={() => {
+                                                    handleSubcriptionOpen()
+                                                    setSubscriptionFieldName(field.name)
+                                                }}>Subscription</Button>
+                                                <Button size="small"
+                                                    style={{ marginLeft: "auto", display: "block" }}
+                                                    onClick={() => {
+                                                        handleOpenPricing()
+                                                        handleTariffsByField(field.name)
+                                                    }}
+                                                >
+                                                    Pricing
+                                                </Button>
+                                                <Dialog
+                                                    open={openPricing}
+                                                    onClose={handleClosePricing}
+                                                    aria-labelledby="pricing-dialog-title"
+                                                    aria-describedby="pricing-dialog-description"
+                                                    fullWidth
+                                                    maxWidth="xs"
+                                                >
+                                                    <DialogTitle id="pricing-dialog-title">
+                                                        Prices
+                                                    </DialogTitle>
+                                                    <DialogContent>
+                                                        <DialogContentText id="pricing-dialog-description" style={{ display: "flex", flexDirection: "column" }}>
+                                                                {
+                                                                    fieldTariffsSort.map((tariff, index) => (
+                                                                        <div style={{ display: "inline-flex", gap: "20px" }}>
+                                                                            <div style={{ display: "flex", flexDirection: "column", width: "100px" }}>
+                                                                                <Form.Text>
+                                                                                    {tariff.type}
+                                                                                </Form.Text>
+                                                                            </div>
+                                                                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                                <Form.Text>
+                                                                                    {tariff.price}$
+                                                                                </Form.Text>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                        </DialogContentText>
+                                                    </DialogContent>
+                                                    <DialogActions style={{justifyContent: "left"}}>
+                                                        <Button onClick={handleClosePricing}
+                                                            variant="outlined"
+                                                            color="error"
+                                                        >Close</Button>
+                                                    </DialogActions>
+                                                </Dialog>
                                                 <Modal
                                                     open={open}
                                                     onClose={handleClose}
@@ -408,11 +641,168 @@ const FieldsPage = () => {
                                                         }
                                                     </Box>
                                                 </Modal>
+                                                <Modal
+                                                    open={openSubscription}
+                                                    onClose={handleSubscriptionClose}
+                                                    aria-labelledby="select-date-title"
+                                                    aria-describedby="select-date-description"
+                                                >
+                                                    <Box sx={subscriptionStyle}>
+                                                        <Typography id="select-day-title" variant="h6" component="h2">
+                                                            Please select a day
+                                                        </Typography>
+                                                        <Form.Group className="mb-3" controlId="formFieldDay">
+                                                            <Form.Select
+                                                                onChange={(e) => {
+                                                                    setSubscriptionDay(e.target.value)
+                                                                }}>
+                                                                <option value="" disabled selected>Select day</option>
+                                                                <option>Monday</option>
+                                                                <option>Tuesday</option>
+                                                                <option>Wednesday</option>
+                                                                <option>Thursday</option>
+                                                                <option>Friday</option>
+                                                                <option>Saturday</option>
+                                                                <option>Sunday</option>
+                                                            </Form.Select>
+                                                        </Form.Group>
+                                                        <Typography id="select-date-title" variant="h6" component="h2">
+                                                            Select start date
+                                                        </Typography>
+                                                        <div id="select-date-description">
+                                                            <Form.Group controlId="chooseDate">
+                                                                <Form.Control
+                                                                    type="date"
+                                                                    min={new Date().toJSON().slice(0, 10)}
+                                                                    name="chooseDate"
+                                                                    onChange={(e) => {
+                                                                        setSubscriptionStartDate(e.target.value);
+                                                                    }}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-date-title" variant="h6" component="h2">
+                                                            Select end date
+                                                        </Typography>
+                                                        <div id="select-date-description">
+                                                            <Form.Group controlId="chooseDate">
+                                                                <Form.Control
+                                                                    type="date"
+                                                                    min={new Date().toJSON().slice(0, 10)}
+                                                                    name="chooseDate"
+                                                                    onChange={(e) => {
+                                                                        setSubscriptionEndDate(e.target.value);
+                                                                    }}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-hour-title" variant="h6" component="h2">
+                                                            Select start hour
+                                                        </Typography>
+                                                        <div id="select-time-description">
+                                                            <Form.Group controlId="chooseTime">
+                                                                <Form.Control
+                                                                    type="time"
+                                                                    name="chooseTime"
+                                                                    value={subscriptionStartHour}
+                                                                    min={minTime}
+                                                                    onChange={handleStartTimeChange}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-hour-title" variant="h6" component="h2">
+                                                            Select end hour
+                                                        </Typography>
+                                                        <div id="select-time-description">
+                                                            <Form.Group controlId="chooseTime">
+                                                                <Form.Control
+                                                                    type="time"
+                                                                    name="chooseTime"
+                                                                    value={subscriptionEndHour}
+                                                                    max={maxTime}
+                                                                    onChange={handleEndTimeChange}
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
+                                                        <br></br>
+                                                        <Typography id="select-type-title" variant="h6" component="h2">
+                                                            Select subscription type
+                                                        </Typography>
+                                                        <Form.Group className="mb-3" controlId="formFieldDay">
+                                                            <Form.Select
+                                                                onChange={(e) => {
+                                                                    setSubscriptionType(e.target.value)
+                                                                }}>
+                                                                <option value="" disabled selected>Select type</option>
+                                                                <option>Weekly</option>
+                                                                <option>Monthly</option>
+                                                                <option>Annually</option>
+                                                            </Form.Select>
+                                                        </Form.Group>
+                                                        <Button variant="contained" sx={{ display: "flex", marginTop: "4em" }}
+                                                            onClick={() => {
+                                                                handleSubscription()
+                                                            }}
+                                                        >
+                                                            Done
+                                                        </Button>
+                                                        <br></br>
+                                                    </Box>
+                                                </Modal>
                                             </CardActions>
                                         )
                                     ) : (
                                         <CardActions>
-                                            <Button size="small" onClick={handleOpen}>Select date</Button>
+                                            <Button size="small" onClick={handleOpen}>Reservation</Button>
+                                            <Button size="small"
+                                                style={{ marginLeft: "auto", display: "block" }}
+                                                onClick={() => {
+                                                    handleOpenPricing()
+                                                    console.log(field.name)
+                                                    handleTariffsByField(field.name)
+                                                }}
+                                            >
+                                                Pricing
+                                            </Button>
+                                            <Dialog
+                                                open={openPricing}
+                                                onClose={handleClosePricing}
+                                                aria-labelledby="pricing-dialog-title"
+                                                aria-describedby="pricing-dialog-description"
+                                                maxWidth="xs"
+                                                fullWidth
+                                            >
+                                                <DialogTitle id="pricing-dialog-title" fontSize="30px" fontWeight="bold">
+                                                    Prices
+                                                </DialogTitle>
+                                                <DialogContent>
+                                                        <DialogContentText id="pricing-dialog-description" style={{ display: "flex", flexDirection: "column" }}>
+                                                            {
+                                                                fieldTariffsSort.map((tariff, index) => (
+                                                                    <div style={{ display: "inline-flex", gap: "20px" }}>
+                                                                        <div style={{ display: "flex", flexDirection: "column", width: "100px" }}>
+                                                                            <Form.Text>
+                                                                                {tariff.type}
+                                                                            </Form.Text>
+                                                                        </div>
+                                                                        <div style={{ display: "flex", flexDirection: "column" }}>
+                                                                            <Form.Text>
+                                                                                {tariff.price}$
+                                                                            </Form.Text>
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </DialogContentText>
+                                                </DialogContent>
+                                                <DialogActions sx={{ display: "flex", justifyContent: "flex-start" }}>
+                                                    <Button color="error" variant="outlined"
+                                                        onClick={handleClosePricing}>Close</Button>
+                                                </DialogActions>
+                                            </Dialog>
                                             <Modal
                                                 open={open}
                                                 onClose={handleClose}
@@ -428,6 +818,7 @@ const FieldsPage = () => {
                                                             <Form.Control
                                                                 type="date"
                                                                 name="chooseDate"
+                                                                min={new Date().toJSON().slice(0, 10)}
                                                                 onChange={(e) => {
                                                                     getVacancies(field.name, e.target.value)
                                                                 }}
@@ -519,17 +910,39 @@ const FieldsPage = () => {
                         </Alert>
                     </Snackbar>
                 ) : (
-                    <Snackbar
-                        id='reservationUnsuccessful'
+                    (checkSubscription === true && fixedTime == true) ? (<Snackbar
+                        id='subscriptionSuccessful'
                         open={isSnackbarOpen}
                         autoHideDuration={6000}
                         onClose={() => { setIsSnackbarOpen(false) }}
                         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                     >
-                        <Alert id='reservationUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
-                            Hmm... Something went wrong.
+                        <Alert id='subscriptionSuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='success' sx={{ width: '100%' }}>
+                            You've successfully subscribed to the selected tennis field!
                         </Alert>
-                    </Snackbar>
+                    </Snackbar>) : (
+                        fixedTime === false ? (<Snackbar
+                            id='subscriptionUnsuccessful'
+                            open={isSnackbarOpen}
+                            autoHideDuration={6000}
+                            onClose={() => { setIsSnackbarOpen(false) }}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        >
+                            <Alert id='subscriptionUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
+                                The start and end hour need to be at fixed hour
+                            </Alert>
+                        </Snackbar>) : (
+                            <Snackbar
+                                id='reservationUnsuccessful'
+                                open={isSnackbarOpen}
+                                autoHideDuration={6000}
+                                onClose={() => { setIsSnackbarOpen(false) }}
+                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            >
+                                <Alert id='reservationUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
+                                    Hmm... Something went wrong.
+                                </Alert>
+                            </Snackbar>))
                 )
             }
         </div >
