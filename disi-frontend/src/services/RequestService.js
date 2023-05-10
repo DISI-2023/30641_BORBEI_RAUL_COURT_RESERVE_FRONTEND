@@ -56,3 +56,25 @@ export function AcceptRequest(request_id, take_over, postedByUserId, takenByUser
             console.log(error);
         })
 }
+
+export function TakeOverRequest(request_id, take_over, postedByUserId, takenByUserId, reservationId) {
+    let credentials = {
+        id: request_id,
+        take_over: take_over,
+        postedByUserId: postedByUserId,
+        takenByUserId: takenByUserId,
+        reservationId: reservationId
+    }
+
+    axiosInstance.put("/request/take/", credentials)
+        .then(
+            res => {
+                if (res.status !== 404 || res.status !== 400) {
+                    window.location.reload()
+                }
+            }
+        )
+        .catch(error => {
+            console.log(error);
+        })
+}
