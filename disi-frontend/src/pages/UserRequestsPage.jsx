@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { GetUserSubscriptions } from '../services/SubscriptionService';
-import { GetRequests, AcceptRequest } from '../services/RequestService';
+import { GetRequests, AcceptRequest, TakeOverRequest } from '../services/RequestService';
 import { Accordion, Typography, AccordionSummary, AccordionDetails, Snackbar, Alert, Button } from '@mui/material'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -94,12 +94,23 @@ function UserRequestsPage() {
                                             }}
                                             disabled={request.takenByUser !== null || request.postedByUser.id === localStorage.getItem("id")}
                                             onClick={() => {
-                                                AcceptRequest(request.id, 'false', request.postedByUser.id, localStorage.getItem("id"), request.reservation.id, (res) => {
-                                                    if (res.status === 200) {
-                                                        window.location.reload()
-                                                    }
-                                                }, (err) => {
-                                                })
+                                                if (request.take_over === false) {
+                                                    AcceptRequest(request.id, 'false', request.postedByUser.id, localStorage.getItem("id"), request.reservation.id, (res) => {
+                                                        if (res.status === 200) {
+                                                            window.location.reload()
+                                                        }
+                                                    }, (err) => {
+                                                    })
+                                                }
+                                                else if (request.take_over === true) {
+                                                    TakeOverRequest(request.id, 'true', request.postedByUser.id, localStorage.getItem("id"), request.reservation.id, (res) => {
+                                                        if (res.status === 200) {
+                                                            window.location.reload()
+                                                        }
+                                                    }, (err) => {
+                                                    })
+                                                }
+
                                             }}
                                             sx={{
                                                 width: "fit-content",
