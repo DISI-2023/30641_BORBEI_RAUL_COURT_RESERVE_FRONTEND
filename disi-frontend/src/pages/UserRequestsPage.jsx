@@ -49,9 +49,13 @@ function UserRequestsPage() {
                                 aria-controls={"request-" + request.id + "-content"}
                                 id={"request-" + request.id + "-header"}
                             >
-                                <Typography sx={{ fontWeight: "bolder", fontStyle: "italic", fontSize: "20px" }}>
-                                    {"Request for partner from " + request.postedByUser.email + " on " + formatDate(request.reservation.startTime)}
-                                </Typography>
+                                {
+                                    request.take_over === false ? (<Typography sx={{ fontWeight: "bolder", fontStyle: "italic", fontSize: "20px" }}>
+                                        {"Request for partner from " + request.postedByUser.email + " on " + formatDate(request.reservation.startTime)}
+                                    </Typography>) : (<Typography sx={{ fontWeight: "bolder", fontStyle: "italic", fontSize: "20px" }}>
+                                        {"Request for take over from " + request.postedByUser.email + " on " + formatDate(request.reservation.startTime)}
+                                    </Typography>)
+                                }
                             </AccordionSummary>
                             <AccordionDetails>
                                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "20px" }}>
@@ -118,15 +122,37 @@ function UserRequestsPage() {
             padding: "20px",
             maxWidth: "100%"
         }}>
-            <br></br>
             <h1>My requests</h1>
             <br></br>
             <br></br>
             <Box sx={{ width: '100%' }}>
                 <Box>
-                    <UsersRequestsList userRequests={userRequests.filter(subscription => {
-                        return subscription;
-                    })} />
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        textColor="primary"
+                        indicatorColor="primary"
+                        aria-label="requests-tabs"
+                    >
+                        <Tab sx={{ fontWeight: "bold" }} value="past" label="Partner requests" />
+                        <Tab sx={{ fontWeight: "bold" }} value="future" label="Take over requests" />
+                    </Tabs>
+                </Box>
+                <Box>
+                    {value === "past" && (
+                        <Box>
+                            <UsersRequestsList userRequests={userRequests.filter(request => {
+                                return request && (request.take_over === false);
+                            })} />
+                        </Box>
+                    )}
+                    {value === "future" && (
+                        <Box>
+                            <UsersRequestsList userRequests={userRequests.filter(request => {
+                                return request && (request.take_over === true);
+                            })} />
+                        </Box>
+                    )}
                 </Box>
             </Box>
         </div>

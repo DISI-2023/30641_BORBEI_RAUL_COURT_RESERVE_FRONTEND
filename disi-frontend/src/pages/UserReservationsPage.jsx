@@ -119,6 +119,27 @@ function UserReservationsPage() {
                                         >
                                             Partner request
                                         </Button>
+                                        <Button
+                                            variant="contained"
+                                            style={{
+                                                color: "white",
+                                                backgroundColor: "primary",
+                                            }}
+                                            onClick={() => {
+                                                console.log(localStorage.getItem("id"))
+                                                AddRequest(true, localStorage.getItem("id"), null, reservation.id, (res) => {
+                                                    if (res.status === 200) {
+                                                        window.location.reload()
+                                                    }
+                                                }, (err) => {
+                                                })
+                                            }}
+                                            sx={{
+                                                width: "fit-content",
+                                            }}
+                                        >
+                                            Take over request
+                                        </Button>
                                     </div>
                                 </div>
                             </AccordionDetails>
