@@ -14,6 +14,7 @@ function UserReservationsPage() {
     const [userReservations, setUserReservations] = useState([])
     const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
     const [value, setValue] = React.useState('future');
+    const [isSnackbarOpenRequest, setIsSnackbarOpenRequest] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -111,6 +112,9 @@ function UserReservationsPage() {
                                                         window.location.reload()
                                                     }
                                                 }, (err) => {
+                                                    if (err.response.status === 404) {
+                                                        setIsSnackbarOpenRequest(true)
+                                                    }
                                                 })
                                             }}
                                             sx={{
@@ -132,6 +136,9 @@ function UserReservationsPage() {
                                                         window.location.reload()
                                                     }
                                                 }, (err) => {
+                                                    if (err.response.status === 404) {
+                                                        setIsSnackbarOpenRequest(true)
+                                                    }
                                                 })
                                             }}
                                             sx={{
@@ -155,6 +162,17 @@ function UserReservationsPage() {
                 >
                     <Alert id='cancelReservationUnsuccessful' onClose={() => { setIsSnackbarOpen(false) }} severity='error' sx={{ width: '100%' }}>
                         A reservation can be canceled only with minimum of 24h in advance
+                    </Alert>
+                </Snackbar>
+                <Snackbar
+                    id='partnerRequestUnsuccessful'
+                    open={isSnackbarOpenRequest}
+                    autoHideDuration={6000}
+                    onClose={() => { setIsSnackbarOpenRequest(false) }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <Alert id='partnerRequestUnsuccessful' onClose={() => { setIsSnackbarOpenRequest(false) }} severity='error' sx={{ width: '100%' }}>
+                        A request for this reservation was already made!
                     </Alert>
                 </Snackbar>
             </div>

@@ -1,6 +1,6 @@
 import axiosInstance from "../axios";
 
-export function AddRequest(take_over, postedByUserId, takenByUserId, reservationId) {
+export function AddRequest(take_over, postedByUserId, takenByUserId, reservationId, callback, errorCallback) {
     let credentials = {
         take_over: take_over,
         postedByUserId: postedByUserId,
@@ -11,13 +11,13 @@ export function AddRequest(take_over, postedByUserId, takenByUserId, reservation
     axiosInstance.post("/request", credentials)
         .then(
             res => {
-                if (res.status !== 404 || res.status !== 400) {
-                    window.location.reload()
-                }
+                if (callback != null)
+                    callback(res)
             }
         )
         .catch(error => {
-            console.log(error);
+            if (errorCallback != null)
+                errorCallback(error)
         })
 }
 
