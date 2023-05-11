@@ -10,6 +10,7 @@ import NavigationBar from './components/NavigationBar';
 import FieldsPage from './pages/FieldsPage';
 import UserReservationsPage from './pages/UserReservationsPage';
 import UserSubscriptionsPage from './pages/UserSubscriptionsPage';
+import UserRequestsPage from './pages/UserRequestsPage';
 import LocationsPage from './pages/LocationsPage';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route exact path="/user" element={localStorage.getItem("isAdmin") !== null && localStorage.getItem("isAdmin") === "false" ? <UserPage /> : <Navigate to="/" />} />
           <Route exact path="/reservations" element={localStorage.getItem("isAdmin") !== null && localStorage.getItem("isAdmin") === "false" ? <UserReservationsPage /> : <Navigate to="/" />} />
           <Route exact path="/subscriptions" element={localStorage.getItem("isAdmin") !== null && localStorage.getItem("isAdmin") === "false" ? <UserSubscriptionsPage /> : <Navigate to="/" />} />
+          <Route exact path="/requests" element={localStorage.getItem("isAdmin") !== null && localStorage.getItem("isAdmin") === "false" ? <UserRequestsPage /> : <Navigate to="/" />} />
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/fields" element={<FieldsPage />} />
           <Route exact path="/locations" element={<LocationsPage />} />

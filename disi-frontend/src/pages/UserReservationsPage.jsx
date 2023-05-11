@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { CancelReservation, GetUserReservations } from '../services/ReservationService'
+import { AddRequest } from '../services/RequestService'
 import { Accordion, Typography, AccordionSummary, AccordionDetails, Snackbar, Alert } from '@mui/material'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -13,6 +14,7 @@ function UserReservationsPage() {
     const [userReservations, setUserReservations] = useState([])
     const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
     const [value, setValue] = React.useState('future');
+    const [isSnackbarOpenRequest, setIsSnackbarOpenRequest] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -75,27 +77,77 @@ function UserReservationsPage() {
                                     <div style={{ display: "inline-flex", gap: "20px" }}>
                                         <Typography sx={{ fontWeight: "bolder", fontStyle: "italic" }}>Total</Typography><Typography>{reservation.finalPrice}</Typography>
                                     </div>
-                                    <Button
-                                        variant="contained"
-                                        color="error"
-                                        onClick={() => {
-                                            CancelReservation(reservation.id, (res) => {
-                                                if (res.status === 200) {
-                                                    window.location.reload()
-                                                }
-                                            }, (err) => {
-                                                if (err.response.status === 304) {
-                                                    setIsSnackbarOpen(true)
-                                                }
-                                                console.log(err)
-                                            })
-                                        }}
-                                        sx={{
-                                            width: "fit-content",
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
+                                    <div style={{ display: "flex", gap: 12 }}>
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => {
+                                                CancelReservation(reservation.id, (res) => {
+                                                    if (res.status === 200) {
+                                                        window.location.reload()
+                                                    }
+                                                }, (err) => {
+                                                    if (err.response.status === 304) {
+                                                        setIsSnackbarOpen(true)
+                                                    }
+                                                    console.log(err)
+                                                })
+                                            }}
+                                            sx={{
+                                                width: "fit-content",
+                                            }}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            style={{
+                                                color: "white",
+                                                backgroundColor: "primary",
+                                            }}
+                                            onClick={() => {
+                                                console.log(localStorage.getItem("id"))
+                                                AddRequest(false, localStorage.getItem("id"), null, reservation.id, (res) => {
+                                                    if (res.status === 200) {
+                                                        window.location.reload()
+                                                    }
+                                                }, (err) => {
+                                                    if (err.response.status === 404) {
+                                                        setIsSnackbarOpenRequest(true)
+                                                    }
+                                                })
+                                            }}
+                                            sx={{
+                                                width: "fit-content",
+                                            }}
+                                        >
+                                            Partner request
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            style={{
+                                                color: "white",
+                                                backgroundColor: "primary",
+                                            }}
+                                            onClick={() => {
+                                                console.log(localStorage.getItem("id"))
+                                                AddRequest(true, localStorage.getItem("id"), null, reservation.id, (res) => {
+                                                    if (res.status === 200) {
+                                                        window.location.reload()
+                                                    }
+                                                }, (err) => {
+                                                    if (err.response.status === 404) {
+                                                        setIsSnackbarOpenRequest(true)
+                                                    }
+                                                })
+                                            }}
+                                            sx={{
+                                                width: "fit-content",
+                                            }}
+                                        >
+                                            Take over request
+                                        </Button>
+                                    </div>
                                 </div>
                             </AccordionDetails>
                         </Accordion>
@@ -112,6 +164,17 @@ function UserReservationsPage() {
                         A reservation can be canceled only with minimum of 24h in advance
                     </Alert>
                 </Snackbar>
+                <Snackbar
+                    id='partnerRequestUnsuccessful'
+                    open={isSnackbarOpenRequest}
+                    autoHideDuration={6000}
+                    onClose={() => { setIsSnackbarOpenRequest(false) }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <Alert id='partnerRequestUnsuccessful' onClose={() => { setIsSnackbarOpenRequest(false) }} severity='error' sx={{ width: '100%' }}>
+                        A request for this reservation was already made!
+                    </Alert>
+                </Snackbar>
             </div>
         )
     }
@@ -122,6 +185,8 @@ function UserReservationsPage() {
             maxWidth: "100%"
         }}>
             <h1>My reservations</h1>
+            <br></br>
+            <br></br>
             <Box sx={{ width: '100%' }}>
                 <Box>
                     <Tabs

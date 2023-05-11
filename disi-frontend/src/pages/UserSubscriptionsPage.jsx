@@ -40,7 +40,7 @@ function UserSubscriptionsPage() {
                             <AccordionSummary
                                 expandIcon={<ChevronDown />}
                                 aria-controls={"subcription-" + subscription.id + "-content"}
-                                id={"subscriprion-" + subscription.id + "-header"}
+                                id={"subscription-" + subscription.id + "-header"}
                             >
                                 <Typography sx={{ fontWeight: "bolder", fontStyle: "italic", fontSize: "20px" }}>
                                     {"Subscription for " + subscription.fieldName + " on " + formatDate(subscription.startTime)}
@@ -86,6 +86,7 @@ function UserSubscriptionsPage() {
         }}>
             <br></br>
             <h1>My subscriptions</h1>
+            <br></br>
             <br></br>
             <Box sx={{ width: '100%' }}>
                 <Box>
