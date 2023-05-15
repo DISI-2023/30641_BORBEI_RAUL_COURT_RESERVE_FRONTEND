@@ -207,6 +207,12 @@ const FieldsPage = () => {
         CreateReservation(selectedStartTime, selectedEndTime, selectedFieldName, localStorage.getItem("email"), (res) => {
             console.log(res.status)
             if (res.status === 201) {
+                axiosInstance.get("/reservation/email", { params: { id: res.data } })
+                    .then(
+                )
+                    .catch(error => {
+
+                    })
                 setCheck(true)
                 setTimeout(() => { window.location.reload(); }, 2000);
             }
